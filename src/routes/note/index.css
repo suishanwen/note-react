@@ -1,0 +1,64 @@
+.note-index {
+    text-align: center;
+    overflow-y: auto;
+}
+
+.note-index .edit {
+    margin-top: 0.37rem;
+    font-size: 0.22rem;
+    color: grey;
+}
+
+.note-index .title {
+    margin-top: 0.37rem;
+}
+
+.note-index .title span {
+    margin-right: 0.92rem;
+}
+
+.note-index .box {
+    width: 14.96rem;
+    margin: 0 auto;
+}
+
+.note-index .box .content {
+    text-align: left;
+    margin: 0.37rem auto;
+}
+
+.note-index .book-mark, .note-index .operate {
+    display: block;
+    position: fixed;
+    margin: auto;
+    top: 0;
+}
+
+.note-index .book-mark img {
+    width: 0.37rem;
+    height: 0.55rem;
+    cursor: pointer;
+}
+
+.note-index .operate ul {
+    border: 1px gainsboro solid;
+    border-radius: 0 30%;
+}
+
+.note-index .operate ul li {
+    margin: 0.18rem 0.18rem;
+    list-style: none;
+}
+
+.note-index .operate ul li > button {
+    cursor: pointer;
+}
+
+.eEditorClient {
+    text-align: left;
+    margin: 0.37rem auto;
+}
+
+.btn.btn-danger.auth-button {
+    margin-left: 0.55rem;
+}

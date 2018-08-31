@@ -1,0 +1,96 @@
+.badge {
+    border-radius: 2px;
+}
+
+.note-edit-index {
+    text-align: center;
+}
+
+.note-edit-index .note-info {
+    display: flex;
+    justify-content: space-between;
+    width: 14.96rem;
+    margin: 0 auto;
+    padding: 0;
+}
+
+.note-edit-index .note-subject {
+    background: red;
+}
+
+.note-edit-index .form-horizontal {
+    margin-top: 0.37rem;
+}
+
+.note-edit-index .form-horizontal .form-group input {
+    margin-left: 0.37rem;
+}
+
+.note-edit-index .form-horizontal .title {
+    width: 8.33rem;
+}
+
+.note-edit-index .form-horizontal .poster {
+    width: 2.78rem;
+}
+
+.note-edit-index .form-horizontal .summary {
+    width: 8.33rem;
+}
+
+.note-edit-index .form-horizontal .tag {
+    width: 2.78rem;
+}
+
+.note-edit-index .form-horizontal .content {
+    width: 14.81rem;
+    height: 9.25rem;
+    margin-top: 0.37rem;
+}
+
+.note-edit-index .form-horizontal .operate {
+    margin-top: 0.37rem;
+}
+
+.form-group .note-info span {
+    font-size: 0.2rem;
+}
+
+@media screen and (max-width: 375px) {
+    .ant-col-xs-0 {
+        display: inline-block !important;
+    }
+
+    .ant-form-item-label.ant-col-xs-0.ant-col-sm-3, .ant-form-item-label.ant-col-xs-0.ant-col-sm-6 {
+        width: 1.2rem !important;
+    }
+
+    input#title.ant-input, input#summary.ant-input {
+        width: 4rem !important;
+    }
+
+    input#poster.ant-input, input#tag.ant-input {
+        width: 2rem !important;
+    }
+
+    .ant-form-item-control-wrapper.ant-col-xs-0.ant-col-sm-20 {
+        width: 4rem;
+    }
+
+    .ant-form-item-control-wrapper.ant-col-xs-0.ant-col-sm-18 {
+        width: 2rem;
+    }
+
+    label {
+        margin-bottom: 0;
+    }
+
+    .ant-row.ant-form-item.ant-form-item-with-help label {
+        margin-bottom: 1.5rem;
+    }
+
+    div.form-group.note-info.form-input {
+        width: 9rem !important;
+    }
+
+}

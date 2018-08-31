@@ -1,0 +1,40 @@
+.note-list-index .note-list {
+    overflow-y: auto;
+}
+
+.note-list-index .note-list ul li {
+    margin: 0.18rem 0 auto;
+    padding: 0;
+    list-style: none;
+    width: 18.96rem;
+    height: 1.85rem;
+    border: 1px solid grey;
+    cursor: pointer;
+    border-radius: 30%;
+}
+
+.note-list-index .note-list ul li:nth-child(even) {
+    background: gainsboro;
+}
+
+.note-list-index .note-list ul li:nth-child(odd) {
+    background: darkgrey;
+}
+
+.note-list-index .note-list ul li span {
+    display: inline-block;
+}
+
+.note-list-index .note-list .title {
+    font: 0.55rem bold;
+    width: 60%;
+}
+
+.note-list-index .note-list .update {
+    font: 0.37rem bold;
+    width: 20%;
+}
+
+.ant-table-tbody > tr {
+    cursor: pointer;
+}
