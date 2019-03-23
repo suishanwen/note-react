@@ -1,6 +1,6 @@
 import {connect} from "react-redux"
 import Body from "../components/body"
-import $ from "jquery"
+import $ from 'jquery';
 import Path from "../../../constants/Path"
 import {queryNoteList, resetNoteListInit} from '../../models/actions/noteAction';
 

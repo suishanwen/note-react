@@ -14,31 +14,31 @@ const RouteWithSubRoutes = (route) => (
 
 class App extends React.Component {
 
-    shouldComponentUpdate() {
-        return false
-    }
+  shouldComponentUpdate() {
+    return false
+  }
 
-    render() {
-        const {store, routes} = this.props;
+  render() {
+    const {store, routes} = this.props;
 
-        return (
-            <Provider store={store}>
+    return (
+        <Provider store={store}>
 
-                <Router history={browserHistory}>
-                    <Switch>
+          <Router history={browserHistory}>
+            <Switch>
 
-                        {routes.map((route, i) => (
-                                <RouteWithSubRoutes key={i} {...route} store={store}/>
-                            )
-                        )}
+              {routes.map((route, i) => (
+                      <RouteWithSubRoutes key={i} {...route} store={store}/>
+                  )
+              )}
 
-                    </Switch>
+            </Switch>
 
-                </Router>
+          </Router>
 
-            </Provider>
-        )
-    }
+        </Provider>
+    )
+  }
 
 
 }

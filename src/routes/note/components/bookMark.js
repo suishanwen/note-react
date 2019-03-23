@@ -1,7 +1,5 @@
 import React from 'react';
-import $ from 'jquery';
 import "../index.css"
-import Path from "../../../constants/Path";
 
 class Bookmark extends React.Component {
     state = {
@@ -17,7 +15,7 @@ class Bookmark extends React.Component {
 
     editNote = (type) => {
         if (type === 0) {
-            sessionStorage.setItem("thread", "");
+            sessionStorage.removeItem("thread");
         }
         const {history} = this.props.ownProps;
         history.push("edit");

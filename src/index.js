@@ -1,12 +1,9 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import {createStore} from './store';
-
-import $ from 'jquery';
 import App from './App';
+import * as serviceWorker from './serviceWorker';
+import {createStore} from './store';
 import routes from './routes';
-import registerServiceWorker from './registerServiceWorker';
-import 'vdap-ui/style/';
 import './index.css';
 
 const store = createStore(window.__INITIAL_STATE__);
@@ -17,12 +14,13 @@ window["isMobile"] = ["Android", "iPhone", "SymbianOS", "Windows Phone", "iPad",
 
 window["rem"] = rem;
 
-window["width"] = $(window).width();
-
+window["width"] = document.body.clientWidth;
 
 ReactDOM.render(
     <App store={store} routes={routes}/>,
     document.getElementById('root')
 );
-
-registerServiceWorker();
+// If you want your app to work offline and load faster, you can change
+// unregister() to register() below. Note this comes with some pitfalls.
+// Learn more about service workers: https://bit.ly/CRA-PWA
+serviceWorker.register();

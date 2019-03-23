@@ -38,11 +38,13 @@
     width: 0.37rem;
     height: 0.55rem;
     cursor: pointer;
+    z-index:-1;
 }
 
 .note-index .operate ul {
     border: 1px gainsboro solid;
     border-radius: 0 30%;
+    z-index:-1;
 }
 
 .note-index .operate ul li {

@@ -10,6 +10,14 @@ const FormItem = Form.Item;
 
 class Edit extends React.Component {
 
+    constructor(props) {
+        super(props);
+        const thread = sessionStorage.getItem("thread");
+        if (thread) {
+            this.queryById(thread);
+        }
+    }
+
     state = {
         id: null,
         title: "",
@@ -20,11 +28,9 @@ class Edit extends React.Component {
         editTime: null,
         summary: "",
         tag: "",
-        recommend: false,
-        init: false
+        recommend: false
     };
 
-    thread = sessionStorage.getItem("thread");
 
     queryById = (thread) => {
         if (Window.progress.isProcessing) {
@@ -34,7 +40,7 @@ class Edit extends React.Component {
         $.get(Path.getUri(`api/note/get?id=${thread}`), (data) => {
             Window.progress.close();
             data.recommend = data.recommend === 1;
-            this.setState(Object.assign({}, data, {init: true}));
+            this.setState(data);
         });
     };
 
@@ -59,7 +65,6 @@ class Edit extends React.Component {
             tag: this.props.form.getFieldsValue().tag,
             content: this.px2Rem(content)
         });
-        delete note.init;
         let url = "";
         if (note.id) {
             url = "api/note/edit";
@@ -134,13 +139,6 @@ class Edit extends React.Component {
     };
 
     render() {
-        if (!this.state.init) {
-            if (this.thread) {
-                this.queryById(this.thread);
-            } else {
-                this.setState({init: true});
-            }
-        }
         const {getFieldDecorator} = this.props.form;
         const formItemLayout = {
             labelCol: {
@@ -241,8 +239,10 @@ class Edit extends React.Component {
                         </div>
                     </div>
                     <div className="form-group">
-                            <textarea name="content" id="content" style={{height: `${(524 - 50) / 54 * window["rem"]}px`}}
-                                      className="content" value={note.content}
+                            <textarea name="content" id="content" readOnly
+                                      style={{height: `${(524 - 50) / 54 * window["rem"]}px`}}
+                                      className="content"
+                                      value={note.content}
                                       onClick={this.newEditor}
                                       required>
                             </textarea>

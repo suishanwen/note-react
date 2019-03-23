@@ -5,7 +5,7 @@ import RENDERER from "./render"
 
 class Nav extends React.Component {
     navigate = (page) => {
-        sessionStorage.setItem("thread", "");
+        sessionStorage.removeItem("thread");
         const {history} = this.props;
         history.push(`/${page}`);
     };

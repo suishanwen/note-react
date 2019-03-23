@@ -31,7 +31,7 @@ class AuthModal extends React.Component {
                 message.success("删除成功！");
                 console.log(res);
                 this.close();
-                sessionStorage.setItem("thread", "");
+                sessionStorage.removeItem("thread");
                 this.backList();
             },
             error: (data) => {

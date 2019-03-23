@@ -6,6 +6,15 @@ import Path from "../../../constants/Path";
 
 class Body extends React.Component {
 
+    constructor(props) {
+        super(props);
+        let thread = this.props.thread;
+        this.queryById(thread);
+        if (window["isMobile"]) {
+            $(".note-index .box")[0].style.width = `${window["width"] - 2}px`;
+        }
+    }
+
     state = {
         id: "",
         title: "",
@@ -16,8 +25,7 @@ class Body extends React.Component {
         editTime: "",
         summary: "",
         tag: "",
-        recommend: 0,
-        init: false
+        recommend: 0
     };
 
     queryById = (thread) => {
@@ -27,20 +35,10 @@ class Body extends React.Component {
         Window.progress.open();
         $.get(Path.getUri(`api/note/get?id=${thread}`), (data) => {
             Window.progress.close();
-            this.setState(Object.assign({}, data, {init: true}));
+            this.setState(data);
         });
     };
 
-
-    componentDidMount() {
-        if (!this.state.init) {
-            let thread = this.props.thread;
-            this.queryById(thread);
-        }
-        if (window["isMobile"]) {
-            $(".note-index .box")[0].style.width = `${window["width"] - 2}px`;
-        }
-    }
 
     render() {
         let note = this.state;

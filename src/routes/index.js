@@ -3,6 +3,7 @@ import List from './list';
 import Note from './note';
 import Edit from './edit';
 import UploadFile from './upload';
+import "antd/dist/antd.css";
 
 
 const routes = [

@@ -46,18 +46,23 @@ const Body = ({data, query, resetInit, ...props}) => {
             }
         }];
     }
-    let rowClick = (note, index) => {
+    let onRowClick = (note, index) => {
         resetInit();
         const {history} = props.ownProps;
         sessionStorage.setItem("thread", note.id);
         history.push(`/note`);
     };
+
     const fontSize = window.getComputedStyle(document.documentElement)["fontSize"];
     const rem = parseFloat(fontSize.replace("px", ""));
     return (
         <Table bordered columns={columns} dataSource={data.list} size='middle'
                pagination={{pageSize: Math.ceil(($(window).height() - 170 / 54 * rem) / 47 / 54 * rem)}}
-               onRowClick={rowClick}
+               onRow={(record, index) => ({
+                   onClick: (event) => {
+                       onRowClick(record, index, event)
+                   }
+               })}
                style={{height: $(window).height() - (56 / 54 * rem) + "px"}}/>
     )
 };
