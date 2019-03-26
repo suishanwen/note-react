@@ -10,8 +10,23 @@ class Body extends React.Component {
         super(props);
         let thread = this.props.thread;
         this.queryById(thread);
+    }
+
+    componentDidMount() {
         if (window["isMobile"]) {
             $(".note-index .box")[0].style.width = `${window["width"] - 2}px`;
+            // setTimeout(() => {
+            //     const imgs = document.getElementsByTagName("img");
+            //     for (let i = 0; i < imgs.length; i++) {
+            //         let item = imgs[i];
+            //         const width = item.width;
+            //         const height = item.height;
+            //         if (width > window["width"]) {
+            //             item.width = window["width"];
+            //             item.height = window["width"] / width * height;
+            //         }
+            //     }
+            // }, 1);
         }
     }
 
@@ -67,9 +82,28 @@ class Body extends React.Component {
     }
 
     componentDidUpdate() {
-        $("#content")[0].innerHTML = this.state.content;
+        let content = this.state.content;
+        if (window["isMobile"]) {
+            content = this.state.content.replace(/<img[^>]*>/gi, match => {
+                let width;
+                let result = match.replace(/width\s*?=\s*?([‘"])[\s\S]*?\1/ig, match1 => {
+                    width = match1.substring(7, match1.lastIndexOf('"'));
+                    if (width > window["width"]) {
+                        return `width="${window["width"]}"`
+                    }
+                    return `width="${width}"`
+                });
+                if (width && width > window["width"]) {
+                    result = result.replace(/height\s*?=\s*?([‘"])[\s\S]*?\1/ig, match2 => {
+                        const height = match2.substring(8, match2.lastIndexOf('"'));
+                        return `height="${window["width"] / width * height}"`
+                    });
+                }
+                return result;
+            });
+        }
+        $("#content")[0].innerHTML = content;
     }
-
 }
 
 
