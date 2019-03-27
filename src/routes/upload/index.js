@@ -1,6 +1,8 @@
 import React from 'react';
 import {Upload, Icon, message} from 'antd';
 
+const package_json = require("../../../package.json");
+
 const Dragger = Upload.Dragger;
 
 class UploadFile extends React.Component {
@@ -8,7 +10,7 @@ class UploadFile extends React.Component {
         const props = {
             name: 'file',
             multiple: true,
-            action: 'http://bitcoinrobot.cn:8051/sw/api/file/upload?type=1',
+            action: `${package_json.proxy}/api/file/upload?type=1`,
             onChange(info) {
                 const status = info.file.status;
                 if (status !== 'uploading') {
