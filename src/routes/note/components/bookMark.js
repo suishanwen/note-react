@@ -34,7 +34,7 @@ class Bookmark extends React.Component {
         let bookmarkHtml = <div className="book-mark" onMouseOver={this.setButtonShow.bind(this, false)}
                                 onMouseOut={this.setButtonShow.bind(this, true)}
                                 onClick={this.setButtonShow.bind(this, true)}><span><img
-            src="http://bitcoinrobot.cn/file/img/note/bookmarks.jpg"/></span></div>;
+            src="https://bitcoinrobot.cn/file/img/note/bookmarks.jpg"/></span></div>;
         let buttonHtml = <div className="operate">
             <ul>
                 <li>

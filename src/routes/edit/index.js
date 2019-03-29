@@ -107,12 +107,12 @@ class Edit extends React.Component {
         const {rem} = window;
         window["noteEditor"] = new window.TQEditor('content', {
             toolbar: 'full',
-            imageUploadUrl: 'http://bitcoinrobot.cn:8051/sw/api/file/upload',
+            imageUploadUrl: 'https://bitcoinrobot.cn:8052/sw/api/file/upload',
             directInsertUploadImage: true,
-            flashUploadUrl: 'http://bitcoinrobot.cn:8051/sw/api/file/upload',
-            videoUploadUrl: 'http://bitcoinrobot.cn:8051/sw/api/file/upload',
-            musicUploadUrl: 'http://bitcoinrobot.cn:8051/sw/api/file/upload',
-            linkUploadUrl: 'http://bitcoinrobot.cn:8051/sw/api/file/upload'
+            flashUploadUrl: 'https://bitcoinrobot.cn:8052/sw/api/file/upload',
+            videoUploadUrl: 'https://bitcoinrobot.cn:8052/sw/api/file/upload',
+            musicUploadUrl: 'https://bitcoinrobot.cn:8052/sw/api/file/upload',
+            linkUploadUrl: 'https://bitcoinrobot.cn:8052/sw/api/file/upload'
         });
         const container = $("#TQEditorContainer_content")[0];
         let width = `${808 / 54 * rem}`;
