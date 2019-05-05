@@ -4,6 +4,7 @@ import $ from 'jquery';
 import Body from './components/body'
 import Bookmark from "./components/bookMark";
 import Comment from "./components/comment";
+import Contact from "./components/contact";
 import AuthModal from './components/modal'
 import MyUtil from "../../constants/MyUtil";
 import {connect} from "react-redux";
@@ -25,6 +26,7 @@ class Note extends React.Component {
                 <Body thread={thread}/>
                 <Comment thread={thread}/>
                 <AuthModal thread={thread} ownProps={this.props}/>
+                <Contact/>
             </div>
 
         );

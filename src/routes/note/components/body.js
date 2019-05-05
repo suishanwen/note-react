@@ -77,6 +77,7 @@ class Body extends React.Component {
                 <div className="box">
                     <div className="content" id="content">loading...</div>
                 </div>
+                <div className="footer-fiexd"/>
             </div>
         );
     }

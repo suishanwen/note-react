@@ -57,6 +57,10 @@
     cursor: pointer;
 }
 
+.note-index .footer-fiexd {
+    height: 52px;
+}
+
 .eEditorClient {
     text-align: left;
     margin: 0.37rem auto;
@@ -134,4 +138,40 @@
     width: 0.92rem;
     height: 1rem;
     border-radius: 0.09rem;
+}
+
+
+.contact-index {
+    background-color: #4B718B;
+    position: absolute;
+    bottom: 0;
+    width: 100%;
+    height: auto;
+    text-align: center;
+    z-index: 2;
+    overflow: hidden;
+}
+
+.contact-index .list-inline.social-link {
+    padding-left: 0;
+    list-style: none;
+    margin-left: -5px;
+}
+
+.contact-index ul li {
+    display: inline-block;
+}
+
+.contact-index ul li a i {
+    width: 60px;
+    padding: 10px 0;
+    font-size: 32px;
+    color: #fff;
+    text-align: center;
+}
+
+.contact-index .copyright {
+    color: white;
+    font-size: 15px;
+    margin: 0 0 10px;
 }
