@@ -23,7 +23,7 @@
   "eslintConfig": {
     "extends": "react-app"
   },
-  "proxy": "http://bitcoinrobot.cn:8052/sw",
+  "proxy": "https://bitcoinrobot.cn",
   "browserslist": [
     ">0.2%",
     "not dead",
