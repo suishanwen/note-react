@@ -1,7 +1,7 @@
 import React from 'react';
 import "./index.css"
 import $ from 'jquery';
-import {Input, Form, Checkbox} from 'antd';
+import {Input, Form, Checkbox, message} from 'antd';
 import DateUtil from "../../constants/DateUtil";
 import JSON from "../../constants/Json";
 import Path from "../../constants/Path";
@@ -84,7 +84,7 @@ class Edit extends React.Component {
                 Window.progress.close();
                 console.log(res);
                 if (res === "") {
-                    alert("当前IP不允许编辑此贴!");
+                    message.error("当前IP不允许编辑此贴!");
                 } else {
                     this.thread = res.id;
                     sessionStorage.setItem("thread", res.id);
@@ -93,8 +93,8 @@ class Edit extends React.Component {
             },
             error: (data) => {
                 console.log(data);
-                alert(data.responseJSON.message);
                 Window.progress.close();
+                message.error(data.responseJSON.message);
             }
         });
     };

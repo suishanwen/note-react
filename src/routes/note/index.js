@@ -3,6 +3,7 @@ import "./index.css"
 import $ from 'jquery';
 import Body from './components/body'
 import Bookmark from "./components/bookMark";
+import Comment from "./components/comment";
 import AuthModal from './components/modal'
 import MyUtil from "../../constants/MyUtil";
 import {connect} from "react-redux";
@@ -22,6 +23,7 @@ class Note extends React.Component {
             <div className="note-index" style={{height: $(window).height()}}>
                 <Bookmark thread={thread} ownProps={this.props} source={source}/>
                 <Body thread={thread}/>
+                <Comment thread={thread}/>
                 <AuthModal thread={thread} ownProps={this.props}/>
             </div>
 

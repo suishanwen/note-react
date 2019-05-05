@@ -32,19 +32,20 @@
     position: fixed;
     margin: auto;
     top: 0;
+    background: white;
 }
 
 .note-index .book-mark img {
     width: 0.37rem;
     height: 0.55rem;
     cursor: pointer;
-    z-index:-1;
+    z-index: -1;
 }
 
 .note-index .operate ul {
     border: 1px gainsboro solid;
     border-radius: 0 30%;
-    z-index:-1;
+    z-index: -1;
 }
 
 .note-index .operate ul li {
@@ -63,4 +64,74 @@
 
 .btn.btn-danger.auth-button {
     margin-left: 0.55rem;
+}
+
+.comment-toggle {
+    position: absolute;
+    right: 0.18rem;
+    top: 0.18rem;
+    cursor: pointer;
+}
+
+.comment-index {
+    position: absolute;
+    float: right;
+    right: 0.5rem;
+    top: 0.18rem;
+    background: white;
+}
+
+.comment-index .comment-area {
+    width: 5.55rem;
+    height: 9.26rem;
+    display: block;
+    border: 1px solid gray;
+}
+
+
+.comment-index .comment-area .comment-div > div {
+    display: inline-block;
+    height: 0.92rem;
+    font-size: 0.22rem;
+}
+
+.comment-index .comment-area .comment-div .comment {
+    text-align: left;
+    font-weight: bold;
+    width: 3.15rem;
+    float: left;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    cursor: pointer;
+}
+
+.comment-index .comment-area .comment-div .comment-info > div {
+    width: 2.31rem;
+}
+
+.comment-index .comment-area .comment-div .comment-info .ip .fa-times:before {
+    color: red;
+    cursor: pointer;
+    float: right;
+    margin-left: 0.37rem;
+}
+
+.comment-index .comment-editor {
+    margin-top: 0.09rem;
+    border-radius: 0.09rem;
+}
+
+.comment-index .comment-editor .editor {
+    width: 4.63rem;
+    height: 1.11rem;
+    border-radius: 0.09rem;
+}
+
+.comment-index .comment-editor .editor-submit {
+    width: 0.92rem;
+    height: 1rem;
+    border-radius: 0.09rem;
 }
