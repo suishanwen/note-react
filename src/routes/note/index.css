@@ -72,9 +72,10 @@
 
 .comment-toggle {
     position: absolute;
-    right: 0.18rem;
+    right: 0.35rem;
     top: 0.18rem;
     cursor: pointer;
+    z-index: 3;
 }
 
 .comment-index {
