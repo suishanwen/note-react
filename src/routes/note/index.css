@@ -33,13 +33,13 @@
     margin: auto;
     top: 0;
     background: white;
+    z-index: 9999;
 }
 
 .note-index .book-mark img {
     width: 0.37rem;
     height: 0.55rem;
     cursor: pointer;
-    z-index: -1;
 }
 
 .note-index .operate ul {
@@ -71,7 +71,7 @@
 }
 
 .comment-toggle {
-    position: absolute;
+    position: fixed;
     right: 0.35rem;
     top: 0.18rem;
     cursor: pointer;
@@ -79,7 +79,7 @@
 }
 
 .comment-index {
-    position: absolute;
+    position: fixed;
     float: right;
     right: 0.5rem;
     top: 0.18rem;
@@ -144,7 +144,7 @@
 
 .contact-index {
     background-color: #4B718B;
-    position: absolute;
+    position: fixed;
     bottom: 0;
     width: 100%;
     height: auto;
