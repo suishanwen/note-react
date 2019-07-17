@@ -84,6 +84,8 @@
     right: 0.5rem;
     top: 0.18rem;
     background: white;
+    opacity: 0.8;
+    z-index: 3;
 }
 
 .comment-index .comment-area {
