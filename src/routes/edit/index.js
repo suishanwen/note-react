@@ -251,7 +251,7 @@ class Edit extends React.Component {
                         {postTimeHtml}
                         {editTimeHtml}
                     </div>
-                    <div className="form-group">
+                    <div className="form-group note-operate">
                         <button className="btn btn-default" onClick={this.backNote}>返回</button>
                         <button className="btn btn-primary" onClick={this.saveNote}>提交</button>
                     </div>

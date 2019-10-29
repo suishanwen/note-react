@@ -4,6 +4,7 @@
 
 .note-edit-index {
     text-align: center;
+    position: relative;
 }
 
 .note-edit-index .note-info {
@@ -55,6 +56,14 @@
 
 .form-group .note-info span {
     font-size: 0.2rem;
+}
+
+@media screen and (max-height: 830px) {
+    .note-operate {
+        position: absolute;
+        bottom: -15px;
+        left: 48%;
+    }
 }
 
 @media screen and (max-width: 375px) {
