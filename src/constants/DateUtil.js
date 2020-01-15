@@ -2,7 +2,7 @@ const reDateTime = /^(?:19|20)[0-9][0-9]-(?:(?:0[1-9])|(?:1[0-2]))-(?:(?:[0-2][1
 
 class DateUtil {
 
-    static formatDateTime(inputTime) {
+    static formatDateTime(inputTime, time = true) {
         if (reDateTime.test(inputTime)) {
             return inputTime;
         }
@@ -18,7 +18,11 @@ class DateUtil {
         let second = date.getSeconds();
         minute = minute < 10 ? ('0' + minute) : minute;
         second = second < 10 ? ('0' + second) : second;
-        return y + '-' + m + '-' + d + ' ' + h + ':' + minute + ':' + second;
+        let r = y + '-' + m + '-' + d;
+        if (time) {
+            r += ' ' + h + ':' + minute + ':' + second;
+        }
+        return r;
     };
 }
 

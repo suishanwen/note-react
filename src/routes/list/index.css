@@ -1,40 +1,131 @@
-.note-list-index .note-list {
+.note-search {
+    position: fixed;
+    left: 100px;
+    z-index: 999;
+    opacity: 70%;
+}
+
+body {
+    font-family: 'Century Gothic', sans-serif;
     overflow-y: auto;
 }
 
-.note-list-index .note-list ul li {
-    margin: 0.18rem 0 auto;
-    padding: 0;
-    list-style: none;
-    width: 18.96rem;
-    height: 1.85rem;
-    border: 1px solid grey;
+.container-fluid {
+    max-width: 1600px;
+}
+
+.container_wapper h1 {
+    margin-bottom: 30px;
+    text-align: center;
+    font: normal normal normal 34px/60px 'Century Gothic', sans-serif;
+    color: #3b3b3b;
+}
+
+.container_wapper {
+    width: 100%;
+    background: #c0c0c0;
+    margin-top: 30px;
+}
+
+/*timeline*/
+#note_list_timeline {
+    background: #fff;
+    float: left;
+}
+
+#note_list_timeline .container-fluid {
+    max-width: 1600px;
+    position: absolute;
+    margin: auto;
+    background: url("/static/images/time_line_bg.jpg") repeat-y center top;
+}
+
+#note_list_timeline .time_line_wap {
+    position: absolute;
+    display: none;
+}
+
+#note_list_timeline .time_line_caption {
+    background: #f15556;
+    padding: 10px 20px 10px 20px;
+    border-radius: 5px;
+    height: 40px;
+    clear: both;
+    color: #fff;
+}
+
+#note_list_timeline .time_line_paragraph {
+    background: #e6e6e6;
+    padding: 10px;
+    border-radius: 5px;
+    width: 100%;
+    margin-top: 50px;
+    font-family: 'Century Gothic', sans-serif;
     cursor: pointer;
-    border-radius: 30%;
 }
 
-.note-list-index .note-list ul li:nth-child(even) {
-    background: gainsboro;
+#note_list_timeline .time_line_paragraph a {
+    color: #000;
+    text-decoration: underline;
 }
 
-.note-list-index .note-list ul li:nth-child(odd) {
-    background: darkgrey;
+#note_list_timeline .left_timeline {
+    margin-left: 30px;
 }
 
-.note-list-index .note-list ul li span {
-    display: inline-block;
+#note_list_timeline .left_timeline .time_line_caption {
+    float: right;
+    margin-right: 0;
 }
 
-.note-list-index .note-list .title {
-    font: 0.55rem bold;
-    width: 60%;
+#note_list_timeline .right_timeline .time_line_caption {
+    float: left;
 }
 
-.note-list-index .note-list .update {
-    font: 0.37rem bold;
-    width: 20%;
+#note_list_timeline .time_line_paragraph h1 {
+    text-align: left;
+    margin: 0;
+    font-size: 24px;
+    line-height: 30px;
+    color: #000;
+    padding: 20px 20px 20px 20px;
 }
 
-.ant-table-tbody > tr {
-    cursor: pointer;
+#note_list_timeline .time_line_paragraph p {
+    padding: 0 20px 20px 20px;
+    text-align: left;
+    margin: 0;
+    font-size: 14px;
+    line-height: 2em;
+    color: #000;
+}
+
+#note_list_timeline .left_timer {
+    float: right;
+    background: url("/static/images/arrow_left.png") 0 5px;
+}
+
+#note_list_timeline .right_timer {
+    float: left;
+    background: url("/static/images/arrow_right.png") 0 5px;
+}
+
+#note_list_timeline .left_timer,
+#note_list_timeline .right_timer {
+    padding-left: 30px;
+    width: 101px;
+    position: absolute;
+}
+
+#note_list_timeline .left_timer span,
+#note_list_timeline .right_timer span {
+    border-radius: 20px;
+    width: 30px;
+    height: 30px;
+    background: #e6e6e6;
+    text-align: center;
+    color: #fff;
+    font-size: 24px;
+    padding-top: 3px;
+    margin-top: 3px;
 }

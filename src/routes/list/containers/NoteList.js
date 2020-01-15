@@ -18,10 +18,11 @@ const filterByKeyword = (data = [], keyword = "") => {
 };
 
 const mapStateToProps = (state) => {
+    window["noteList"] =  state.noteList.data;
     return {
         data: {
             init: state.noteList.init,
-            list: filterByKeyword(state.noteList.data, state.noteList.keyword),
+            list: state.noteList.data
         }
     };
 };
@@ -34,6 +35,10 @@ const mapDispatchToProps = (dispatch, state) => {
             Window.progress.open();
             $.get(Path.getUri("api/note"), (data) => {
                 Window.progress.close();
+                data.forEach((note) => {
+                    note.tags = note.tag ? note.tag.split("|") : [];
+                    note.key = note.id;
+                });
                 dispatch(queryNoteList(data));
             });
         },
