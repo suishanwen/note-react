@@ -2,7 +2,7 @@
     position: fixed;
     left: 100px;
     z-index: 999;
-    opacity: 70%;
+    opacity: 70% !important;
 }
 
 body {
