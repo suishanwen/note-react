@@ -95,7 +95,8 @@ const getUnit = (count, unit) => {
 };
 
 export const getTimeInfo = (t, n) => {
-    var pDate = new Date(t);
+    //兼容safari
+    var pDate = new Date(t.replace(/\-/g, "/"));
     var year = n.getFullYear() - pDate.getFullYear();
     var month = (n.getMonth() + 1) - (pDate.getMonth() + 1);
     var days = n.getDate() - pDate.getDate();

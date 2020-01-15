@@ -18,7 +18,6 @@ const Header = ({keyword, change, ...props}) => {
                     clearTimeout(window["timer"]);
                 }
                 window["timer"] = setTimeout(() => {
-                    console.log("sc");
                     $('html,body').animate({scrollTop: $('#' + id)[0].offsetTop}, 1000);
                 }, 500);
             }
