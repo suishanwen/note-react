@@ -128,7 +128,11 @@ class Tip extends React.Component {
                     expireSeconds: 30,
                 }).then(trx => {
                     // That's it!
-                    message.success({content: `Transaction ID: ${trx.transaction_id}`, key, duration: 30});
+                    message.success({
+                        content: `Transaction ID: <a href="https://bloks.io/transaction/${trx.transaction_id}">{trx.transaction_id}</a>`,
+                        key,
+                        duration: 30
+                    });
                     console.log(`Transaction ID: ${trx.transaction_id}`);
                 }).catch(error => {
                     console.error(error);
@@ -141,7 +145,6 @@ class Tip extends React.Component {
                 message.error({content: error.message, key, duration: 8});
             });
         });
-
     };
 
     render() {

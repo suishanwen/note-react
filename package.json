@@ -4,7 +4,7 @@
   "private": true,
   "dependencies": {
     "antd": "^3.26.7",
-    "eosjs": "^20.0.0",
+    "eosjs": "20.0.0-beta2.2",
     "jquery": "^3.4.1",
     "react": "^16.12.0",
     "react-dom": "^16.12.0",
