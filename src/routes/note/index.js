@@ -4,6 +4,7 @@ import $ from 'jquery';
 import Body from './components/body'
 import Bookmark from "./components/bookMark";
 import Comment from "./components/comment";
+import Tip from "./components/tip";
 import Contact from "./components/contact";
 import AuthModal from './components/modal'
 import MyUtil from "../../constants/MyUtil";
@@ -24,6 +25,7 @@ class Note extends React.Component {
             <div className="note-index" style={{height: $(window).height()}}>
                 <Bookmark thread={thread} ownProps={this.props} source={source}/>
                 <Body thread={thread}/>
+                <Tip thread={thread}/>
                 <Comment thread={thread}/>
                 <AuthModal thread={thread} ownProps={this.props}/>
                 <Contact/>

@@ -37,12 +37,12 @@ const Body = ({data, query, resetInit, ...props}) => {
                         <div className="time_line_paragraph">
                             <h1>{note.title}</h1>
                             <p>
-                                <span className="glyphicon glyphicon-user"/> <a
-                                href="javascript:void(0)">{note.poster}</a> &nbsp;&nbsp;
+                                <span className="glyphicon glyphicon-user"/>
+                                <a>{note.poster}</a> &nbsp;&nbsp;
                                 <span className="glyphicon glyphicon-bookmark"/>
                                 <span key={index}>
                                     {note.tags && note.tags.map((tag, index) => {
-                                        return <a href="javascript:void(0)" key={index}>{tag}</a>
+                                        return <a key={index}>{tag}</a>
                                     })}
                             </span> &nbsp;&nbsp;
                             </p>

@@ -44,7 +44,7 @@ class Contact extends React.PureComponent {
                         <a href="http://www.github.com/suishanwen" target="_blank"><i className="fa fa-github"/></a>
                     </li>
                     <li>
-                        <span className="copyright">Copyright &copy; 2019 suishanwen | Bitcoin(Cash) Address :
+                        <span className="copyright">Copyright &copy; 2020 suishanwen | Bitcoin(Cash) Address :
                             <a href="https://bch.btc.com/1D3TFfPSPGnjKfaryX56fpx32GGqNSWDzi" className="bitcoin"
                                target="_blank">1D3TFfPSPGnjKfaryX56fpx32GGqNSWDzi</a>(<a
                                 onClick={this.verify}>verify</a>)

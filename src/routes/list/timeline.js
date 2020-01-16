@@ -27,7 +27,7 @@ import $ from 'jquery';
                 $(this).addClass("right_timeline");
                 $.timeline_old_right_position_top = $.timeline_right_position_top;
                 $.timeline_right_position_top = $.timeline_right_position_top + $(this).outerHeight() + 40;
-                $(this).prepend("<a href=\"#\" class=\"right_timer\"><span class=\"glyphicon glyphicon-time\"></span></a>");
+                $(this).prepend("<a  class=\"right_timer\"><span class=\"glyphicon glyphicon-time\"></span></a>");
                 $(this).children("a.right_timer").css({left: -86, width: 60,});
             } else if ($.timeline_left_position_top == 0) {
                 $("#note_list_timeline .container-fluid").css({"position": "relative"});
@@ -40,7 +40,7 @@ import $ from 'jquery';
                 $(this).addClass("left_timeline");
                 $.timeline_old_left_position_top = $.timeline_left_position_top;
                 $.timeline_left_position_top = $.timeline_left_position_top + $(this).outerHeight() + 40;
-                $(this).prepend("<a href=\"#\" class=\"left_timer\"><span class=\"glyphicon glyphicon-time\"></span></a>");
+                $(this).prepend("<a  class=\"left_timer\"><span class=\"glyphicon glyphicon-time\"></span></a>");
                 $(this).children("a.left_timer").css({left: $.timeline_item_width - 50,});
             } else if ($.timeline_right_position_top < $.timeline_left_position_top) {
                 $("#note_list_timeline .container-fluid").css({"position": "relative"});
@@ -54,7 +54,7 @@ import $ from 'jquery';
                 $(this).addClass("right_timeline");
                 $.timeline_old_right_position_top = $.timeline_right_position_top;
                 $.timeline_right_position_top = $.timeline_right_position_top + $(this).outerHeight() + 40;
-                $(this).prepend("<a href=\"#\" class=\"right_timer\"><span class=\"glyphicon glyphicon-time\"></span></a>");
+                $(this).prepend("<a  class=\"right_timer\"><span class=\"glyphicon glyphicon-time\"></span></a>");
                 $(this).children("a.right_timer").css({left: -99,});
             } else {
                 $("#note_list_timeline .container-fluid").css({"position": "relative"});
@@ -68,7 +68,7 @@ import $ from 'jquery';
                 $(this).addClass("left_timeline");
                 $.timeline_old_left_position_top = $.timeline_left_position_top;
                 $.timeline_left_position_top = $.timeline_left_position_top + $(this).outerHeight() + 40;
-                $(this).prepend("<a href=\"#\" class=\"left_timer\"><span class=\"glyphicon glyphicon-time\"></span></a>");
+                $(this).prepend("<a  class=\"left_timer\"><span class=\"glyphicon glyphicon-time\"></span></a>");
                 $(this).children("a.left_timer").css({left: $.timeline_item_width - 50,});
             }
             //calculate and define container height
