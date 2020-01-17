@@ -99,7 +99,7 @@ class Tip extends React.Component {
                 message.success({
                     content: `actor: ${account.name}, permission: ${account.authority}`,
                     key,
-                    duration: 10
+                    duration: 5
                 });
                 // Get a proxy reference to eosjs which you can use to sign transactions with a user's Scatter.
                 const rpc = new JsonRpc(network.fullhost());
@@ -125,24 +125,25 @@ class Tip extends React.Component {
                         }]
                 }, {
                     blocksBehind: 3,
-                    expireSeconds: 30,
+                    expireSeconds: 10,
                 }).then(trx => {
                     // That's it!
                     message.success({
-                        content: `Transaction ID: <a href="https://bloks.io/transaction/${trx.transaction_id}">{trx.transaction_id}</a>`,
+                        content: <a href={"https://bloks.io/transaction/" + trx.transaction_id} target="_blank">Transaction
+                            ID: {trx.transaction_id}</a>,
                         key,
-                        duration: 30
+                        duration: 10
                     });
                     console.log(`Transaction ID: ${trx.transaction_id}`);
                 }).catch(error => {
                     console.error(error);
-                    message.error({content: error.message, key, duration: 8});
+                    message.error({content: error.message, key, duration: 5});
                 });
 
             }).catch(error => {
                 // The user rejected this request, or doesn't have the appropriate requirements.
                 console.error(error);
-                message.error({content: error.message, key, duration: 8});
+                message.error({content: error.message, key, duration: 5});
             });
         });
     };

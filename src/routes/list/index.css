@@ -1,8 +1,8 @@
 .note-search {
     position: fixed;
     left: 100px;
-    z-index: 999;
-    opacity: 70% !important;
+    z-index: -1;
+    opacity: 70%;
 }
 
 body {
