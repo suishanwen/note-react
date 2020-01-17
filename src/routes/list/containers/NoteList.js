@@ -18,7 +18,6 @@ const filterByKeyword = (data = [], keyword = "") => {
 };
 
 const mapStateToProps = (state) => {
-    window["noteList"] =  state.noteList.data;
     return {
         data: {
             init: state.noteList.init,

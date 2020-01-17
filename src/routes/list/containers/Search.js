@@ -4,7 +4,7 @@ import {filterNoteList} from '../../models/actions/noteAction';
 
 
 const mapStateToProps = (state) => {
-    return {keyword: state.noteList.keyword};
+    return {keyword: state.noteList.keyword, list: state.noteList.data};
 };
 
 const mapDispatchToProps = (dispatch) => {

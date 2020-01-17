@@ -1,3 +1,6 @@
+/*window.getComputedStyle(document.documentElement)["fontSize"];*/
+/*1em = 52px*/
+
 html {
     overflow: hidden;
 }

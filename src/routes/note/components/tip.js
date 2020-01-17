@@ -76,11 +76,12 @@ class Tip extends React.Component {
     };
 
     doTips = () => {
-        const tips = this.props.form.getFieldsValue().tips;
+        let tips = this.props.form.getFieldsValue().tips;
         if (!tips || tips <= 0) {
             message.warning("请输入金额-_-");
             return;
         }
+        tips = Number(tips).toFixed(4);
         message.loading({content: 'waiting scatter login...', key});
         // First we need to connect to the user's Scatter.
         ScatterJS.scatter.connect('Tips').then(connected => {
@@ -103,7 +104,7 @@ class Tip extends React.Component {
                 });
                 // Get a proxy reference to eosjs which you can use to sign transactions with a user's Scatter.
                 const rpc = new JsonRpc(network.fullhost());
-                const eos = ScatterJS.eos(network, Api, {rpc});
+                const eos = ScatterJS.eos(network, Api, {rpc, beta2: true});
                 // ----------------------------
                 // Now that we have an identity,
                 // an EOSIO account, and a reference
@@ -120,12 +121,12 @@ class Tip extends React.Component {
                                 from: account.name,
                                 to: "sw.bank",
                                 quantity: `${tips} EOS`,
-                                memo: "Tip"
+                                memo: `Tip ${tips} EOS to [${this.props.title}]`
                             }
                         }]
                 }, {
                     blocksBehind: 3,
-                    expireSeconds: 10,
+                    expireSeconds: 30,
                 }).then(trx => {
                     // That's it!
                     message.success({

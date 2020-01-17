@@ -5,15 +5,13 @@ import $ from "jquery";
 const FormItem = Form.Item;
 
 
-const Header = ({keyword, change, ...props}) => {
+const Header = ({keyword, list, change, ...props}) => {
     const {getFieldDecorator} = props.form;
     const search = () => {
-        // change(props.form.getFieldsValue().keyword);
         setTimeout(() => {
             const kw = props.form.getFieldsValue().keyword;
-            const id = forKeyword(window["noteList"], kw);
+            const id = forKeyword(kw);
             if (id) {
-                console.log(id + "-" + $('#' + id).offset().top);
                 if (window["timer"]) {
                     clearTimeout(window["timer"]);
                 }
@@ -25,11 +23,11 @@ const Header = ({keyword, change, ...props}) => {
         }, 0);
     };
 
-    const forKeyword = (data = [], keyword = "") => {
-        if (!keyword || data.length === 0) {
+    const forKeyword = (keyword = "") => {
+        if (!keyword || !list || list.length === 0) {
             return 0;
         }
-        const _filter = data.filter(note => note.title.toUpperCase().indexOf(keyword.toUpperCase()) !== -1);
+        const _filter = list.filter(note => note.title.toUpperCase().indexOf(keyword.toUpperCase()) !== -1);
         if (_filter.length > 0) {
             return _filter[0].id;
         }

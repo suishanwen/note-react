@@ -12,6 +12,7 @@ const Body = ({data, query, resetInit, ...props}) => {
         resetInit();
         const {history} = props.ownProps;
         sessionStorage.setItem("thread", note.id);
+        sessionStorage.setItem("title", note.title);
         history.push(`/note`);
     };
 

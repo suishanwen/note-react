@@ -15,9 +15,11 @@ class Note extends React.Component {
     render() {
         const {location} = this.props;
         let thread = MyUtil.getQueryString(location.search, "thread");
-        let source = MyUtil.getQueryString(location.search, "source");
+        let title = "";
+        const source = MyUtil.getQueryString(location.search, "source");
         if (!thread) {
             thread = sessionStorage.getItem("thread");
+            title = sessionStorage.getItem("title");
         } else {
             sessionStorage.setItem("thread", thread);
         }
@@ -25,7 +27,7 @@ class Note extends React.Component {
             <div className="note-index" style={{height: $(window).height()}}>
                 <Bookmark thread={thread} ownProps={this.props} source={source}/>
                 <Body thread={thread}/>
-                <Tip thread={thread}/>
+                <Tip thread={thread} title={title}/>
                 <Comment thread={thread}/>
                 <AuthModal thread={thread} ownProps={this.props}/>
                 <Contact/>
