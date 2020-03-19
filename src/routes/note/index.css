@@ -101,6 +101,15 @@
     background: green;
 }
 
+.tip-index .detail-area {
+    font-size: 15px;
+    color: green;
+}
+
+.tip-index .detail-id {
+    margin-right: 5px;
+}
+
 .tip-operate .tips-input {
     float: left;
 }

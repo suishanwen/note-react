@@ -8,6 +8,8 @@ import ScatterJS from 'scatterjs-core';
 import ScatterEOS from 'scatterjs-plugin-eosjs2';
 import {JsonRpc, Api} from 'eosjs'
 import imageUrl from '../../../images/eos.png'
+
+
 // Don't forget to tell ScatterJS which plugins you are using.
 ScatterJS.plugins(new ScatterEOS());
 const scatter = ScatterJS.scatter;
@@ -23,6 +25,9 @@ const network = {
         return `${network.protocol}://${network.host}${network.port ? ':' : ''}${network.port}`
     }
 };
+
+const rpc = new JsonRpc(network.fullhost(), {fetch});
+
 const FormItem = Form.Item;
 const key = 'updatable';
 
@@ -39,7 +44,35 @@ class Tip extends React.Component {
 
     componentDidMount() {
         this.loadUser();
+        this.getTips();
     }
+
+    getTips = async () => {
+        try {
+            const data = await rpc.get_table_rows({
+                json: true,                 // Get the response as json
+                code: "bitcoinrobot",           // Contract that we target
+                scope: "bitcoinrobot",          // Account that owns the data
+                table: "tip",          // Table name
+                table_key: "",           // Table secondary key name
+                index_position: 2,
+                key_type: "i64",
+                limit: -1,
+                lower_bound: parseInt(this.props.thread),     // Table primary key value
+                upper_bound: parseInt(this.props.thread),     // Table primary key value
+            });
+            const rows = data.rows;
+            console.log(rows);
+            if (rows && rows.length > 0) {
+                const sum = rows.map(row => parseFloat(row.quantity.replace(" EOS", ""))).reduce((q1, q2) => {
+                    return q1 + q2
+                }, 0).toFixed(4);
+                this.setState(Object.assign(this.state, {tips: sum, details: rows}));
+            }
+        } catch (e) {
+            console.log(e);
+        }
+    };
 
     loadUser = () => {
         let ls = localStorage.getItem("eos");
@@ -104,7 +137,7 @@ class Tip extends React.Component {
                 });
                 // Get a proxy reference to eosjs which you can use to sign transactions with a user's Scatter.
                 const rpc = new JsonRpc(network.fullhost());
-                const eos = ScatterJS.eos(network, Api, {rpc, beta2: true});
+                const eos = ScatterJS.eos(network, Api, {rpc});
                 // ----------------------------
                 // Now that we have an identity,
                 // an EOSIO account, and a reference
@@ -122,6 +155,16 @@ class Tip extends React.Component {
                                 to: "sw.bank",
                                 quantity: `${tips} EOS`,
                                 memo: `Tip ${tips} EOS to [${this.props.title}]`
+                            }
+                        }, {
+                            account: "bitcoinrobot", //has to be the smart contract name of the token you want to transfer - eosio for EOS or eosjackscoin for JKR for example
+                            name: "receive",
+                            authorization: [{actor: account.name, permission: account.authority}],
+                            data: {
+                                from: account.name,
+                                to: "sw.bank",
+                                quantity: `${tips} EOS`,
+                                thread: this.props.thread
                             }
                         }]
                 }, {
@@ -151,13 +194,14 @@ class Tip extends React.Component {
 
     render() {
         const {getFieldDecorator} = this.props.form;
+        console.log("this.state");
+        console.log(this.state);
         return (
             <div>
                 <div className="tip-index">
-                    <div className="eos-user">
+                    <div className="eos-user" style={{display: this.state.loginUser ? "block" : "none"}}>
                         <div className="user-auth"><a>{this.state.loginUser}</a></div>
-                        <div className="log-out"><a onClick={this.logOut.bind(this)}
-                                                    style={{display: this.state.loginUser ? "block" : "none"}}><i
+                        <div className="log-out"><a onClick={this.logOut.bind(this)}><i
                             className="fa fa-sign-out"
                             aria-hidden="true"/></a></div>
                     </div>
@@ -182,12 +226,14 @@ class Tip extends React.Component {
                         {
                             this.state.details.map((detail, index) =>
                                 <div key={index} className="detail">
-                                    <span className="detail-id" title={detail.id}>
-                                        {detail.id}
-                                    </span>
-                                    <span className="detail-amount">
-                                        {detail.amount}
-                                    </span>
+                                    <a href={"https://bloks.io/transaction/" + detail.trxid} target="_blank">
+                                        <span className="detail-id" title={detail.from}>
+                                            {detail.from}
+                                        </span>
+                                        <span className="detail-amount">
+                                            {detail.quantity}
+                                        </span>
+                                    </a>
                                 </div>
                             )
                         }
