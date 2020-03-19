@@ -1,11 +1,9 @@
 import React from 'react';
 import "../index.css"
-import $ from "jquery";
-import Path from "../../../constants/Path";
 import JSON from "../../../constants/Json";
 import {Form, Input, message} from 'antd';
-import ScatterJS from 'scatterjs-core';
-import ScatterEOS from 'scatterjs-plugin-eosjs2';
+import ScatterJS from '@scatterjs/core';
+import ScatterEOS from '@scatterjs/eosjs2';
 import {JsonRpc, Api} from 'eosjs'
 import imageUrl from '../../../images/eos.png'
 
@@ -25,11 +23,11 @@ const network = {
         return `${network.protocol}://${network.host}${network.port ? ':' : ''}${network.port}`
     }
 };
+const key = 'updatable';
 
 const rpc = new JsonRpc(network.fullhost(), {fetch});
 
 const FormItem = Form.Item;
-const key = 'updatable';
 
 class Tip extends React.Component {
     state = {
@@ -178,6 +176,7 @@ class Tip extends React.Component {
                         key,
                         duration: 10
                     });
+                    this.getTips();
                     console.log(`Transaction ID: ${trx.transaction_id}`);
                 }).catch(error => {
                     console.error(error);
@@ -222,7 +221,7 @@ class Tip extends React.Component {
                         </FormItem>
                         <button className="btn btn-primary" onClick={this.doTips.bind(this)}>打赏(Tip)</button>
                     </div>
-                    <div className="detail-area">
+                    <div className="detail-area" style={{display: this.state.details.length > 0 ? "block" : "none"}}>
                         {
                             this.state.details.map((detail, index) =>
                                 <div key={index} className="detail">
