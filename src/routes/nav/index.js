@@ -24,6 +24,10 @@ class Nav extends React.Component {
         );
     }
 
+    componentWillMount() {
+        $("body").css({"overflow": "hidden"});
+    }
+
     componentDidMount() {
         const {rem} = window;
         let marginTB = ($(window).height() / rem - 5.55) / 2;

@@ -3,6 +3,7 @@ import Search from './containers/Search'
 import NoteList from './containers/NoteList'
 import "./index.css"
 import Contact from "../note/components/contact";
+import $ from "jquery";
 
 // const List = () => (
 //     <div className="note-list-index">
@@ -13,6 +14,7 @@ import Contact from "../note/components/contact";
 class List extends React.Component {
 
     componentWillMount() {
+        $("body").css({"overflow-y": "auto"});
     }
 
 
