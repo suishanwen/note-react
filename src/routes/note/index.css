@@ -117,7 +117,8 @@
 
 .tip-operate button {
     float: left;
-    margin-top: 2px;
+    margin-top: 3px;
+    width: 90px !important;
 }
 
 .eos-user .user-auth, .log-out {
