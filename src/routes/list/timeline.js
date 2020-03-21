@@ -7,7 +7,8 @@ import $ from 'jquery';
         $.timeline_old_right_position_top = 0;
         $.timeline_left_position_top = 0;
         $.timeline_old_left_position_top = 0;
-        const w_width = ($(window).width() > 1600) ? 1600 : $(window).width();
+        const timelineWidth = $("#note_list_timeline").width();
+        const w_width = timelineWidth > 1600 ? 1600 : timelineWidth;
         $.timeline_item_width = (w_width - 50) / 2;
         $(".time_line_wap").each(function () {
             //if class name already exit remove

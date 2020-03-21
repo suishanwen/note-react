@@ -14,7 +14,7 @@ import $ from "jquery";
 class List extends React.Component {
 
     componentWillMount() {
-        $("body").css({"overflow-y": "auto"});
+        $("body").css({"overflow-y": "scroll"});
     }
 
 
