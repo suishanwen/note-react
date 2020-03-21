@@ -16,7 +16,7 @@ import $ from 'jquery';
             $(this).removeClass("left_timeline");
             $(this).removeClass("right_timeline");
             if ($(window).width() < 970) {
-                $("#note_list_timeline .container-fluid").css({"position": "absolute"});
+                $("#note_list_timeline .container-fluid").css({"position": "relative"});
                 const positon_left = $("#note_list_timeline .container-fluid").position().left + 100;
                 //put on right
                 $(this).css({
