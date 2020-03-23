@@ -1,6 +1,5 @@
 import React from 'react';
 import "./index.css"
-import $ from 'jquery';
 import Body from './components/body'
 import Bookmark from "./components/bookMark";
 import Comment from "./components/comment";
@@ -24,7 +23,7 @@ class Note extends React.Component {
             sessionStorage.setItem("thread", thread);
         }
         return (
-            <div className="note-index" style={{height: $(window).height()}}>
+            <div className="note-index">
                 <Bookmark thread={thread} ownProps={this.props} source={source}/>
                 <Body thread={thread}/>
                 <Tip thread={thread} title={title}/>
