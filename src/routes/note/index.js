@@ -9,8 +9,13 @@ import AuthModal from './components/modal'
 import MyUtil from "../../constants/MyUtil";
 import {connect} from "react-redux";
 import {setModalView} from "../models/actions/noteAction";
+import $ from "jquery";
 
 class Note extends React.Component {
+    componentWillMount() {
+        $("body").css({"overflow-y": "auto"});
+    }
+
     render() {
         const {location} = this.props;
         let thread = MyUtil.getQueryString(location.search, "thread");
