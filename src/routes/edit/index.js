@@ -71,6 +71,11 @@ class Edit extends React.Component {
         } else {
             url = "api/note/add";
         }
+        const token = localStorage.getItem('adminToken');
+        if (!token) {
+            message.error("请先前往 /login 设置 Token");
+            return;
+        }
         if (Window.progress.isProcessing) {
             return false;
         }
@@ -79,22 +84,19 @@ class Edit extends React.Component {
             url: Path.getUri(url),
             type: "post",
             contentType: "application/json;charset=utf-8",
+            headers: { 'x-auth-token': token },
             data: JSON.stringify(note),
             success: (res) => {
                 Window.progress.close();
                 console.log(res);
-                if (res === "") {
-                    message.error("当前IP不允许编辑此贴!");
-                } else {
-                    this.thread = res.id;
-                    sessionStorage.setItem("thread", res.id);
-                    this.backNote();
-                }
+                this.thread = res.id;
+                sessionStorage.setItem("thread", res.id);
+                this.backNote();
             },
             error: (data) => {
                 console.log(data);
                 Window.progress.close();
-                message.error(data.responseJSON.message);
+                message.error(data.responseJSON ? data.responseJSON.message : '操作失败');
             }
         });
     };

@@ -2,7 +2,7 @@ import Nav from './nav';
 import List from './list';
 import Note from './note';
 import Edit from './edit';
-import UploadFile from './upload';
+import Login from './login';
 import "antd/dist/antd.css";
 
 
@@ -33,9 +33,9 @@ const routes = [
         component: Edit
     },
     {
-        name: "Upload",
-        path: '/upload',
-        component: UploadFile
+        name: "Login",
+        path: '/login',
+        component: Login
     }
 ];
 export default routes;
