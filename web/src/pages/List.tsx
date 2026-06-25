@@ -26,6 +26,8 @@ export default function List() {
 
   // 拖拽仅在无搜索/筛选时启用，避免在过滤视图里改结构产生困惑
   const canDrag = isAuthed && !keyword.trim() && !activeTag;
+  // 搜索/筛选时默认展开，以便看到命中的子节点；平时默认收起
+  const isFiltering = !!keyword.trim() || !!activeTag;
 
   // 关键字、标签过滤后组装成树，保留命中节点的祖先链
   const tree = useMemo(() => {
@@ -80,6 +82,7 @@ export default function List() {
         <NoteTree
           nodes={tree}
           draggable={canDrag}
+          defaultExpanded={isFiltering}
           onTagClick={setActiveTag}
           onMove={(id, parent) => moveMutation.mutate({ id, parent })}
         />

@@ -9,11 +9,19 @@ import './noteTree.css';
 interface Props {
   nodes: NoteNode[];
   draggable?: boolean;
+  // 默认是否展开子级；搜索/筛选时传 true 以显示命中的子节点
+  defaultExpanded?: boolean;
   onTagClick?: (tag: string) => void;
   onMove?: (dragId: number, targetParentId: number) => void;
 }
 
-export default function NoteTree({ nodes, draggable = false, onTagClick, onMove }: Props) {
+export default function NoteTree({
+  nodes,
+  draggable = false,
+  defaultExpanded = false,
+  onTagClick,
+  onMove
+}: Props) {
   const [dragId, setDragId] = useState<number | null>(null);
   const [overId, setOverId] = useState<number | null>(null);
   const [overRoot, setOverRoot] = useState(false);
@@ -53,6 +61,7 @@ export default function NoteTree({ nodes, draggable = false, onTagClick, onMove 
 
   const ctx: ItemCtx = {
     draggable,
+    defaultExpanded,
     dragId,
     overId,
     setDragId,
@@ -77,7 +86,7 @@ export default function NoteTree({ nodes, draggable = false, onTagClick, onMove 
           放到这里 · 设为顶级笔记
         </div>
       )}
-      <ul className="note-tree">
+      <ul className="note-tree" key={defaultExpanded ? 'expanded' : 'collapsed'}>
         {nodes.map((node) => (
           <TreeItem key={node.id} node={node} ctx={ctx} />
         ))}
@@ -88,6 +97,7 @@ export default function NoteTree({ nodes, draggable = false, onTagClick, onMove 
 
 interface ItemCtx {
   draggable: boolean;
+  defaultExpanded: boolean;
   dragId: number | null;
   overId: number | null;
   setDragId: (id: number | null) => void;
@@ -98,7 +108,7 @@ interface ItemCtx {
 }
 
 function TreeItem({ node, ctx }: { node: NoteNode; ctx: ItemCtx }) {
-  const [expanded, setExpanded] = useState(true);
+  const [expanded, setExpanded] = useState(ctx.defaultExpanded);
   const navigate = useNavigate();
   const hasChildren = node.children.length > 0;
   const tags = node.tag ? node.tag.split('|').filter(Boolean) : [];
