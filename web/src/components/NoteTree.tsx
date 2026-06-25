@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import type { NoteNode } from '../utils/tree';
 import { isDescendant } from '../utils/tree';
+import { useTreeDrag } from '../hooks/useTreeDrag';
 import { fromNow } from '../utils/date';
 import { ENCRYPTED, RECOMMEND } from '../types';
 import './noteTree.css';
@@ -9,7 +10,6 @@ import './noteTree.css';
 interface Props {
   nodes: NoteNode[];
   draggable?: boolean;
-  // 默认是否展开子级；搜索/筛选时传 true 以显示命中的子节点
   defaultExpanded?: boolean;
   onTagClick?: (tag: string) => void;
   onMove?: (dragId: number, targetParentId: number) => void;
@@ -22,10 +22,6 @@ export default function NoteTree({
   onTagClick,
   onMove
 }: Props) {
-  const [dragId, setDragId] = useState<number | null>(null);
-  const [overId, setOverId] = useState<number | null>(null);
-  const [overRoot, setOverRoot] = useState(false);
-
   const findNode = (list: NoteNode[], id: number): NoteNode | null => {
     for (const n of list) {
       if (n.id === id) return n;
@@ -34,63 +30,64 @@ export default function NoteTree({
     }
     return null;
   };
-  const dragNode = dragId != null ? findNode(nodes, dragId) : null;
 
-  // 合法放置点：非自身、非自己的子孙、非当前父级
-  const canDropOn = (targetId: number) =>
-    dragNode != null &&
-    dragId !== targetId &&
-    !isDescendant(dragNode, targetId) &&
-    dragNode.parent !== targetId;
-
-  const reset = () => {
-    setDragId(null);
-    setOverId(null);
-    setOverRoot(false);
+  const canDropOn = (dragId: number, targetId: number) => {
+    const dragNode = findNode(nodes, dragId);
+    return (
+      dragNode != null &&
+      dragId !== targetId &&
+      !isDescendant(dragNode, targetId) &&
+      dragNode.parent !== targetId
+    );
   };
 
-  const handleDropOn = (targetId: number) => {
-    if (dragId != null && canDropOn(targetId)) onMove?.(dragId, targetId);
-    reset();
-  };
-
-  const handleDropRoot = () => {
-    if (dragId != null && dragNode && dragNode.parent !== -1) onMove?.(dragId, -1);
-    reset();
-  };
+  const { state, onItemPointerDown, isDragging } = useTreeDrag({
+    enabled: draggable,
+    canDropOn,
+    onDropOn: (dragId, targetId) => onMove?.(dragId, targetId),
+    onDropRoot: (dragId) => {
+      const dragNode = findNode(nodes, dragId);
+      if (dragNode && dragNode.parent !== -1) onMove?.(dragId, -1);
+    }
+  });
 
   const ctx: ItemCtx = {
     draggable,
     defaultExpanded,
-    dragId,
-    overId,
-    setDragId,
-    setOverId,
+    dragId: state.dragId,
+    overId: state.overId,
+    onItemPointerDown,
     onTagClick,
     canDropOn,
-    handleDropOn
+    isDragging
   };
 
   return (
     <div className="note-tree-wrap">
-      {draggable && dragId != null && (
+      {draggable && state.dragId != null && (
         <div
-          className={`tree-root-drop ${overRoot ? 'tree-drop-active' : ''}`}
-          onDragOver={(e) => {
-            e.preventDefault();
-            setOverRoot(true);
-          }}
-          onDragLeave={() => setOverRoot(false)}
-          onDrop={handleDropRoot}
+          data-drop-root
+          className={`tree-root-drop ${state.overRoot ? 'tree-drop-active' : ''}`}
         >
-          放到这里 · 设为顶级笔记
+          {state.overRoot ? '松手 · 移到顶层' : '拖到这里 · 移出为顶层笔记'}
         </div>
       )}
+
       <ul className="note-tree" key={defaultExpanded ? 'expanded' : 'collapsed'}>
         {nodes.map((node) => (
           <TreeItem key={node.id} node={node} ctx={ctx} />
         ))}
       </ul>
+
+      {/* 拖拽浮层：跟随指针 */}
+      {state.ghost && (
+        <div
+          className="tree-ghost"
+          style={{ left: state.ghost.x + 12, top: state.ghost.y + 12 }}
+        >
+          {state.ghost.title}
+        </div>
+      )}
     </div>
   );
 }
@@ -100,11 +97,10 @@ interface ItemCtx {
   defaultExpanded: boolean;
   dragId: number | null;
   overId: number | null;
-  setDragId: (id: number | null) => void;
-  setOverId: (id: number | null) => void;
+  onItemPointerDown: (e: React.PointerEvent, id: number, title: string) => void;
   onTagClick?: (tag: string) => void;
-  canDropOn: (id: number) => boolean;
-  handleDropOn: (id: number) => void;
+  canDropOn: (dragId: number, targetId: number) => boolean;
+  isDragging: () => boolean;
 }
 
 function TreeItem({ node, ctx }: { node: NoteNode; ctx: ItemCtx }) {
@@ -112,42 +108,34 @@ function TreeItem({ node, ctx }: { node: NoteNode; ctx: ItemCtx }) {
   const navigate = useNavigate();
   const hasChildren = node.children.length > 0;
   const tags = node.tag ? node.tag.split('|').filter(Boolean) : [];
-  const isOver = ctx.overId === node.id && ctx.canDropOn(node.id);
-  const isDragging = ctx.dragId === node.id;
+  const isOver =
+    ctx.dragId != null && ctx.overId === node.id && ctx.canDropOn(ctx.dragId, node.id);
+  const isDragSource = ctx.dragId === node.id;
 
   const flag =
     node.recommend === ENCRYPTED ? 'enc' : node.recommend === RECOMMEND ? 'rec' : '';
 
+  // 拖拽刚结束的瞬间不要触发导航
+  const handleClick = () => {
+    if (ctx.isDragging()) return;
+    navigate(`/note/${node.id}`);
+  };
+
   return (
     <li className="tree-item">
       <div
-        className={`tree-row${flag ? ` tree-row-${flag}` : ''}${isOver ? ' tree-drop-active' : ''}${isDragging ? ' tree-dragging' : ''}`}
-        draggable={ctx.draggable}
-        onDragStart={(e) => {
-          e.stopPropagation();
-          // 必须 setData，否则 Firefox 等浏览器不启动拖拽
-          e.dataTransfer.setData('text/plain', String(node.id));
-          e.dataTransfer.effectAllowed = 'move';
-          ctx.setDragId(node.id);
-        }}
-        onDragEnd={() => ctx.setDragId(null)}
-        onDragOver={(e) => {
-          if (ctx.dragId == null) return;
-          e.preventDefault();
-          e.stopPropagation();
-          e.dataTransfer.dropEffect = ctx.canDropOn(node.id) ? 'move' : 'none';
-          ctx.setOverId(node.id);
-        }}
-        onDragLeave={() => ctx.setOverId(null)}
-        onDrop={(e) => {
-          e.preventDefault();
-          e.stopPropagation();
-          ctx.handleDropOn(node.id);
-        }}
+        data-note-id={node.id}
+        className={`tree-row${flag ? ` tree-row-${flag}` : ''}${isOver ? ' tree-drop-active' : ''}${isDragSource ? ' tree-dragging' : ''}`}
+        style={ctx.draggable ? { touchAction: 'pan-y' } : undefined}
+        onPointerDown={(e) => ctx.draggable && ctx.onItemPointerDown(e, node.id, node.title)}
       >
         <button
           className={`tree-toggle${hasChildren ? '' : ' is-leaf'}`}
-          onClick={() => hasChildren && setExpanded((v) => !v)}
+          onClick={(e) => {
+            e.stopPropagation();
+            if (hasChildren) setExpanded((v) => !v);
+          }}
+          onPointerDown={(e) => e.stopPropagation()}
           aria-label={hasChildren ? (expanded ? '折叠' : '展开') : undefined}
           tabIndex={hasChildren ? 0 : -1}
         >
@@ -160,7 +148,7 @@ function TreeItem({ node, ctx }: { node: NoteNode; ctx: ItemCtx }) {
           )}
         </button>
 
-        <button className="tree-main" onClick={() => navigate(`/note/${node.id}`)}>
+        <button className="tree-main" onClick={handleClick}>
           {flag === 'enc' && <span className="tree-flag" title="加密笔记">🔒</span>}
           {flag === 'rec' && <span className="tree-flag" title="推荐笔记">★</span>}
           <span className="tree-title">{node.title}</span>
@@ -172,6 +160,7 @@ function TreeItem({ node, ctx }: { node: NoteNode; ctx: ItemCtx }) {
             <button
               key={tag}
               className="tag clickable"
+              onPointerDown={(e) => e.stopPropagation()}
               onClick={(e) => {
                 e.stopPropagation();
                 ctx.onTagClick?.(tag);

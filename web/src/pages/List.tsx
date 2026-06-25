@@ -75,7 +75,7 @@ export default function List() {
       )}
 
       {canDrag && tree.length > 0 && (
-        <p className="list-hint">已登录：拖拽笔记可调整父子层级</p>
+        <p className="list-hint">长按笔记可拖动调整层级，拖到顶部区域移出为顶层</p>
       )}
 
       {!isLoading && tree.length > 0 && (
