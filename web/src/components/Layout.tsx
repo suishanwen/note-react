@@ -31,7 +31,8 @@ export default function Layout({ children }: { children: ReactNode }) {
       <header className="topbar">
         <div className="topbar-inner container">
           <Link to="/" className="brand">
-            Note
+            <span className="brand-mark" aria-hidden="true">N</span>
+            <span className="brand-text">Note</span>
           </Link>
           <nav className="topbar-actions">
             <button className="icon-btn" onClick={toggle} title="切换主题" aria-label="切换主题">

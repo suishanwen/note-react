@@ -16,17 +16,30 @@
 }
 
 .list-hint {
+  display: flex;
+  align-items: center;
+  gap: 6px;
   font-size: 12.5px;
   color: var(--text-faint);
   margin: 0 0 10px 2px;
 }
 
+.list-hint::before {
+  content: '⠿';
+  color: var(--text-faint);
+}
+
 .list-grid {
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 6px;
+  background: var(--bg-elevated);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 10px;
 }
 
 .skeleton-row {
-  height: 40px;
+  height: 38px;
+  border-radius: var(--radius-sm);
 }

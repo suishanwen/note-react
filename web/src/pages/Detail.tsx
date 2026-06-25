@@ -74,7 +74,7 @@ export default function Detail() {
       <header className="detail-header">
         <h1 className="detail-title">
           {note.recommend === ENCRYPTED && <span className="detail-flag" title="加密">🔒</span>}
-          {note.recommend === RECOMMEND && <span className="detail-flag" title="推荐">⭐</span>}
+          {note.recommend === RECOMMEND && <span className="detail-flag detail-flag-rec" title="推荐">★</span>}
           {note.title}
         </h1>
         <div className="detail-meta">

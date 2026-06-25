@@ -50,7 +50,7 @@ router.get('/', canViewEncrypted, async (req, res) => {
   const sql =
     `SELECT ${LIST_FIELDS} FROM note` +
     (where.length ? ` WHERE ${where.join(' AND ')}` : '') +
-    ' ORDER BY (recommend = 1) DESC, COALESCE(edit_time, post_time) DESC';
+    ' ORDER BY COALESCE(edit_time, post_time) DESC';
   try {
     const [rows] = await pool.query(sql, params);
     res.json(rows.map((row) => maskListRow(row, req.canViewEncrypted)));

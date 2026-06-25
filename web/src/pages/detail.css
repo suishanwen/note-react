@@ -1,32 +1,45 @@
 .detail-page {
-  max-width: 720px;
+  max-width: 740px;
   margin: 0 auto;
+  background: var(--bg-elevated);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  padding: 40px 44px;
 }
 
 .detail-header {
   margin-bottom: 28px;
+  padding-bottom: 22px;
+  border-bottom: 1px solid var(--border);
 }
 
 .detail-title {
-  font-size: 32px;
-  font-weight: 750;
+  font-size: 30px;
+  font-weight: 700;
   letter-spacing: -0.02em;
-  line-height: 1.25;
+  line-height: 1.3;
   margin: 0 0 14px;
 }
 
 .detail-flag {
-  font-size: 22px;
+  font-size: 20px;
   margin-right: 8px;
   vertical-align: middle;
+  color: var(--gold);
+}
+
+.detail-flag-rec {
+  color: var(--accent);
 }
 
 .detail-meta {
   display: flex;
   flex-wrap: wrap;
-  gap: 16px;
+  gap: 14px;
   color: var(--text-faint);
-  font-size: 13px;
+  font-size: 12.5px;
+  font-family: var(--font-mono);
 }
 
 .detail-tags {
@@ -76,4 +89,13 @@
 
 .locked-box .btn {
   margin-top: 8px;
+}
+
+@media (max-width: 640px) {
+  .detail-page {
+    padding: 24px 18px;
+  }
+  .detail-title {
+    font-size: 24px;
+  }
 }

@@ -8,8 +8,9 @@
   position: sticky;
   top: 0;
   z-index: 50;
-  background: color-mix(in srgb, var(--bg) 85%, transparent);
-  backdrop-filter: saturate(180%) blur(12px);
+  background: var(--bg);
+  background: color-mix(in srgb, var(--bg) 82%, transparent);
+  backdrop-filter: saturate(180%) blur(14px);
   border-bottom: 1px solid var(--border);
 }
 
@@ -21,7 +22,10 @@
 }
 
 .brand {
-  font-size: 20px;
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  font-size: 19px;
   font-weight: 700;
   letter-spacing: -0.02em;
   color: var(--text);
@@ -29,7 +33,24 @@
 
 .brand:hover {
   text-decoration: none;
-  color: var(--accent);
+}
+
+.brand-mark {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 8px;
+  background: var(--accent);
+  color: #fff;
+  font-size: 15px;
+  font-weight: 700;
+  box-shadow: var(--shadow-sm);
+}
+
+.brand-text {
+  color: var(--text);
 }
 
 .topbar-actions {
@@ -42,17 +63,19 @@
   width: 38px;
   height: 38px;
   border-radius: var(--radius-sm);
-  border: 1px solid var(--border);
+  border: 1px solid var(--border-strong);
   background: var(--bg-elevated);
   font-size: 16px;
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: border-color var(--transition);
+  box-shadow: var(--shadow-sm);
+  transition: border-color var(--transition), transform var(--transition);
 }
 
 .icon-btn:hover {
   border-color: var(--text-faint);
+  transform: translateY(-1px);
 }
 
 .topbar-tip {

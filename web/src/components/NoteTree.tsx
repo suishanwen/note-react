@@ -18,7 +18,6 @@ export default function NoteTree({ nodes, draggable = false, onTagClick, onMove 
   const [overId, setOverId] = useState<number | null>(null);
   const [overRoot, setOverRoot] = useState(false);
 
-  // 当前被拖节点（用于防环判断）
   const findNode = (list: NoteNode[], id: number): NoteNode | null => {
     for (const n of list) {
       if (n.id === id) return n;
@@ -29,12 +28,18 @@ export default function NoteTree({ nodes, draggable = false, onTagClick, onMove 
   };
   const dragNode = dragId != null ? findNode(nodes, dragId) : null;
 
-  // 目标是否为合法放置点：非自身、非自己的子孙
+  // 合法放置点：非自身、非自己的子孙、非当前父级
   const canDropOn = (targetId: number) =>
     dragNode != null &&
     dragId !== targetId &&
     !isDescendant(dragNode, targetId) &&
     dragNode.parent !== targetId;
+
+  const reset = () => {
+    setDragId(null);
+    setOverId(null);
+    setOverRoot(false);
+  };
 
   const handleDropOn = (targetId: number) => {
     if (dragId != null && canDropOn(targetId)) onMove?.(dragId, targetId);
@@ -46,13 +51,7 @@ export default function NoteTree({ nodes, draggable = false, onTagClick, onMove 
     reset();
   };
 
-  const reset = () => {
-    setDragId(null);
-    setOverId(null);
-    setOverRoot(false);
-  };
-
-  const ctx = {
+  const ctx: ItemCtx = {
     draggable,
     dragId,
     overId,
@@ -64,7 +63,7 @@ export default function NoteTree({ nodes, draggable = false, onTagClick, onMove 
   };
 
   return (
-    <div>
+    <div className="note-tree-wrap">
       {draggable && dragId != null && (
         <div
           className={`tree-root-drop ${overRoot ? 'tree-drop-active' : ''}`}
@@ -75,7 +74,7 @@ export default function NoteTree({ nodes, draggable = false, onTagClick, onMove 
           onDragLeave={() => setOverRoot(false)}
           onDrop={handleDropRoot}
         >
-          拖到此处设为顶级笔记
+          放到这里 · 设为顶级笔记
         </div>
       )}
       <ul className="note-tree">
@@ -104,14 +103,21 @@ function TreeItem({ node, ctx }: { node: NoteNode; ctx: ItemCtx }) {
   const hasChildren = node.children.length > 0;
   const tags = node.tag ? node.tag.split('|').filter(Boolean) : [];
   const isOver = ctx.overId === node.id && ctx.canDropOn(node.id);
+  const isDragging = ctx.dragId === node.id;
+
+  const flag =
+    node.recommend === ENCRYPTED ? 'enc' : node.recommend === RECOMMEND ? 'rec' : '';
 
   return (
     <li className="tree-item">
       <div
-        className={`tree-row ${isOver ? 'tree-drop-active' : ''} ${ctx.dragId === node.id ? 'tree-dragging' : ''}`}
+        className={`tree-row${flag ? ` tree-row-${flag}` : ''}${isOver ? ' tree-drop-active' : ''}${isDragging ? ' tree-dragging' : ''}`}
         draggable={ctx.draggable}
         onDragStart={(e) => {
           e.stopPropagation();
+          // 必须 setData，否则 Firefox 等浏览器不启动拖拽
+          e.dataTransfer.setData('text/plain', String(node.id));
+          e.dataTransfer.effectAllowed = 'move';
           ctx.setDragId(node.id);
         }}
         onDragEnd={() => ctx.setDragId(null)}
@@ -119,33 +125,40 @@ function TreeItem({ node, ctx }: { node: NoteNode; ctx: ItemCtx }) {
           if (ctx.dragId == null) return;
           e.preventDefault();
           e.stopPropagation();
+          e.dataTransfer.dropEffect = ctx.canDropOn(node.id) ? 'move' : 'none';
           ctx.setOverId(node.id);
         }}
         onDragLeave={() => ctx.setOverId(null)}
         onDrop={(e) => {
+          e.preventDefault();
           e.stopPropagation();
           ctx.handleDropOn(node.id);
         }}
       >
         <button
-          className={`tree-toggle ${hasChildren ? '' : 'tree-toggle-empty'}`}
+          className={`tree-toggle${hasChildren ? '' : ' is-leaf'}`}
           onClick={() => hasChildren && setExpanded((v) => !v)}
-          aria-label={expanded ? '折叠' : '展开'}
+          aria-label={hasChildren ? (expanded ? '折叠' : '展开') : undefined}
+          tabIndex={hasChildren ? 0 : -1}
         >
-          {hasChildren ? (expanded ? '▾' : '▸') : '·'}
+          {hasChildren ? (
+            <svg viewBox="0 0 16 16" className={`tree-caret${expanded ? ' open' : ''}`} aria-hidden="true">
+              <path d="M6 4l4 4-4 4" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
+            </svg>
+          ) : (
+            <span className="tree-dot" aria-hidden="true" />
+          )}
         </button>
 
-        <div className="tree-main" onClick={() => navigate(`/note/${node.id}`)}>
-          <span className="tree-title">
-            {node.recommend === ENCRYPTED && <span className="tree-icon" title="加密">🔒</span>}
-            {node.recommend === RECOMMEND && <span className="tree-icon" title="推荐">⭐</span>}
-            <span className="tree-title-text">{node.title}</span>
-          </span>
+        <button className="tree-main" onClick={() => navigate(`/note/${node.id}`)}>
+          {flag === 'enc' && <span className="tree-flag" title="加密笔记">🔒</span>}
+          {flag === 'rec' && <span className="tree-flag" title="推荐笔记">★</span>}
+          <span className="tree-title">{node.title}</span>
           {node.summary && <span className="tree-summary">{node.summary}</span>}
-        </div>
+        </button>
 
         <div className="tree-meta">
-          {tags.map((tag) => (
+          {tags.slice(0, 3).map((tag) => (
             <button
               key={tag}
               className="tag clickable"
@@ -157,7 +170,7 @@ function TreeItem({ node, ctx }: { node: NoteNode; ctx: ItemCtx }) {
               {tag}
             </button>
           ))}
-          <span className="tree-time">{fromNow(node.postTime)}</span>
+          <time className="tree-time">{fromNow(node.editTime ?? node.postTime)}</time>
         </div>
       </div>
 
