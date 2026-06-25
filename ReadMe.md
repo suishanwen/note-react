@@ -46,8 +46,8 @@ cd web && npm install && npm run dev      # 默认 3000，代理 /api 与 /uploa
 - **状态**（`recommend` 三态，编辑器下拉选择）：
   - `0` 普通
   - `1` 推荐（列表/详情带 ⭐ 标记，排序靠前）
-  - `-1` 加密（需授权码或管理员登录才能查看正文）
-- **加密访问**：未授权时列表仅显示标题与 🔒 图标，正文接口返回 403；输入 `UNLOCK_CODE` 授权码可解锁查看，管理员登录后默认可见全部。
+  - `-1` 加密（需管理员密码才能查看正文）
+- **加密访问**：未授权时列表仅显示标题与 🔒 图标，正文接口返回 403；输入**管理员密码**（`ADMIN_PASSWORD`）即可解锁查看，管理员登录后默认可见全部。
 
 ## 数据迁移（旧库 HTML → Markdown，自动）
 
@@ -65,6 +65,28 @@ docker compose run --rm \
   --entrypoint sh app -c "node scripts/migrate.js --dry-run"
 ```
 
+## 远程更新
+
+管理员登录后，顶栏「更新」按钮（或 `POST /api/admin/update`，带管理员 JWT）可远程触发更新。
+
+由于 app 跑在容器内、无法重建自身，更新流程解耦为：接口写一个触发标记文件 → 宿主机常驻脚本 `update-watcher.sh` 监听到后执行 `git pull && docker compose up -d --build`。容器不接触宿主机 docker，无提权风险。
+
+部署时在宿主机项目根目录后台启动监听脚本（一次即可，建议配 systemd 开机自启）：
+
+```bash
+nohup ./update-watcher.sh > update-watcher.log 2>&1 &
+```
+
+用 curl 触发示例：
+
+```bash
+TOKEN=$(curl -s -X POST https://bitcoinrobot.cn/api/auth/login \
+  -H 'Content-Type: application/json' -d '{"password":"管理员密码"}' | sed 's/.*"token":"\([^"]*\)".*/\1/')
+curl -X POST https://bitcoinrobot.cn/api/admin/update -H "Authorization: Bearer $TOKEN"
+```
+
+执行日志写在 `.trigger/last-update.log`。
+
 ## 目录
 
 ```
@@ -72,5 +94,6 @@ docker compose run --rm \
 ├─ server/             后端（Express + MySQL）+ 迁移脚本
 ├─ note.sql            单表 note 结构
 ├─ Dockerfile          多阶段：构建前端 → 运行后端
-└─ docker-compose.yml  一键启动（配置内联，连已有 MySQL）
+├─ docker-compose.yml  一键启动（配置内联，连已有 MySQL）
+└─ update-watcher.sh   宿主机更新监听脚本（远程更新用）
 ```

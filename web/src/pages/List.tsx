@@ -12,7 +12,7 @@ export default function List() {
   const [activeTag, setActiveTag] = useState('');
   const [unlocked, setUnlocked] = useState(() => !!getUnlockToken());
   const [showUnlock, setShowUnlock] = useState(false);
-  const [code, setCode] = useState('');
+  const [password, setPassword] = useState('');
   const queryClient = useQueryClient();
 
   const { data, isLoading, isError, error } = useQuery({
@@ -21,12 +21,12 @@ export default function List() {
   });
 
   const unlockMutation = useMutation({
-    mutationFn: () => unlockApi(code),
+    mutationFn: () => unlockApi(password),
     onSuccess: (res) => {
       setUnlockToken(res.token);
       setUnlocked(true);
       setShowUnlock(false);
-      setCode('');
+      setPassword('');
       queryClient.invalidateQueries({ queryKey: ['notes'] });
     }
   });
@@ -88,15 +88,15 @@ export default function List() {
           className="unlock-bar"
           onSubmit={(e) => {
             e.preventDefault();
-            if (code) unlockMutation.mutate();
+            if (password) unlockMutation.mutate();
           }}
         >
           <input
             className="input"
             type="password"
-            placeholder="输入授权码解锁加密笔记"
-            value={code}
-            onChange={(e) => setCode(e.target.value)}
+            placeholder="输入管理员密码解锁加密笔记"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
             autoFocus
           />
           <button className="btn btn-primary" disabled={unlockMutation.isPending}>

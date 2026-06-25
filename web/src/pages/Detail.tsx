@@ -16,7 +16,7 @@ export default function Detail() {
   const queryClient = useQueryClient();
   const { isAuthed } = useAuth();
   const [confirming, setConfirming] = useState(false);
-  const [code, setCode] = useState('');
+  const [password, setPassword] = useState('');
 
   const { data: note, isLoading, isError, error } = useQuery({
     queryKey: ['note', id],
@@ -34,10 +34,10 @@ export default function Detail() {
   });
 
   const unlockMutation = useMutation({
-    mutationFn: () => unlockApi(code),
+    mutationFn: () => unlockApi(password),
     onSuccess: (res) => {
       setUnlockToken(res.token);
-      setCode('');
+      setPassword('');
       queryClient.invalidateQueries({ queryKey: ['note', id] });
     }
   });
@@ -58,20 +58,20 @@ export default function Detail() {
         <div className="locked-box">
           <div className="locked-icon">🔒</div>
           <h2>该笔记已加密</h2>
-          <p>请输入授权码解锁查看</p>
+          <p>请输入管理员密码解锁查看</p>
           <form
             className="locked-form"
             onSubmit={(e) => {
               e.preventDefault();
-              if (code) unlockMutation.mutate();
+              if (password) unlockMutation.mutate();
             }}
           >
             <input
               className="input"
               type="password"
-              placeholder="授权码"
-              value={code}
-              onChange={(e) => setCode(e.target.value)}
+              placeholder="管理员密码"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
               autoFocus
             />
             <button className="btn btn-primary" disabled={unlockMutation.isPending}>

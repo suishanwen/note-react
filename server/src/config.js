@@ -26,13 +26,14 @@ const config = {
     adminPassword: process.env.ADMIN_PASSWORD || 'admin',
     jwtSecret: process.env.JWT_SECRET || 'note-dev-secret-change-me',
     jwtExpiresIn: '7d',
-    // 加密笔记的全局授权码，校验通过后签发解锁令牌
-    unlockCode: process.env.UNLOCK_CODE || 'unlock',
+    // 解锁令牌有效期：访客凭管理员密码解锁加密笔记后签发
     unlockExpiresIn: '7d'
   },
   // 上传目录与前端静态产物目录，默认相对 server 根
   uploadDir: process.env.UPLOAD_DIR || path.resolve(__dirname, '../uploads'),
-  staticDir: process.env.STATIC_DIR || path.resolve(__dirname, '../public')
+  staticDir: process.env.STATIC_DIR || path.resolve(__dirname, '../public'),
+  // 远程更新触发目录（挂载到宿主机），写标记文件由宿主机脚本监听执行
+  triggerDir: process.env.TRIGGER_DIR || ''
 };
 
 export default config;

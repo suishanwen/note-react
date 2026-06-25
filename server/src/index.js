@@ -6,6 +6,7 @@ import { initDatabase } from './init.js';
 import authRouter from './routes/auth.js';
 import notesRouter from './routes/notes.js';
 import uploadRouter from './routes/upload.js';
+import adminRouter from './routes/admin.js';
 
 const app = express();
 app.set('trust proxy', true);
@@ -15,6 +16,7 @@ app.use(express.json({ limit: '10mb' }));
 app.use('/api/auth', authRouter);
 app.use('/api/notes', notesRouter);
 app.use('/api/upload', uploadRouter);
+app.use('/api/admin', adminRouter);
 
 // 上传文件静态访问
 fs.mkdirSync(config.uploadDir, { recursive: true });

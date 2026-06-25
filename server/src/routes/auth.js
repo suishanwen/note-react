@@ -17,12 +17,12 @@ router.post('/login', (req, res) => {
   res.json({ token });
 });
 
-// POST /api/auth/unlock — 校验全局授权码并签发解锁令牌
+// POST /api/auth/unlock — 凭管理员密码签发解锁令牌（查看加密笔记，但无管理权限）
 router.post('/unlock', (req, res) => {
-  const { code } = req.body || {};
-  if (!code || code !== config.auth.unlockCode) {
-    console.warn('AuthRoute#unlock 授权码校验失败');
-    return res.status(401).json({ message: '授权码错误' });
+  const { password } = req.body || {};
+  if (!password || password !== config.auth.adminPassword) {
+    console.warn('AuthRoute#unlock 密码校验失败');
+    return res.status(401).json({ message: '密码错误' });
   }
   const token = jwt.sign({ scope: 'unlock' }, config.auth.jwtSecret, {
     expiresIn: config.auth.unlockExpiresIn

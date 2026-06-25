@@ -16,12 +16,13 @@ services:
       SRC_DB_NAME: sw                   # 旧库名；首次启动从这里自动迁移。留空则关闭迁移
       # ── 应用配置 ──────────────────────────────
       PORT: 3001
-      ADMIN_PASSWORD: change-me         # ← 改：管理员登录密码
+      ADMIN_PASSWORD: change-me         # ← 改：管理员登录密码（也用于解锁加密笔记）
       JWT_SECRET: change-me-to-a-long-random-string   # ← 改：随机长串
-      UNLOCK_CODE: change-me            # ← 改：加密笔记的全局授权码
       UPLOAD_DIR: /app/uploads
+      TRIGGER_DIR: /app/.trigger        # 远程更新触发目录，挂载到宿主机项目下
     volumes:
       - uploads:/app/uploads
+      - ./.trigger:/app/.trigger        # 与宿主机 update-watcher.sh 共享
     ports:
       - '3001:3001'                     # 宿主机:容器，按需改宿主机端口
 

@@ -55,6 +55,16 @@
   border-color: var(--text-faint);
 }
 
+.topbar-tip {
+  margin-top: 12px;
+  padding: 10px 16px;
+  border-radius: var(--radius-sm);
+  background: var(--accent-soft);
+  color: var(--accent);
+  font-size: 13.5px;
+  cursor: pointer;
+}
+
 .content {
   flex: 1;
   width: 100%;
