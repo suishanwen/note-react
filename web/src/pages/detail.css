@@ -10,6 +10,12 @@
   margin: 0 0 14px;
 }
 
+.detail-flag {
+  font-size: 22px;
+  margin-right: 8px;
+  vertical-align: middle;
+}
+
 .detail-meta {
   display: flex;
   flex-wrap: wrap;
@@ -38,4 +44,48 @@
 .detail-admin {
   display: flex;
   gap: 10px;
+}
+
+.locked-box {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  padding: 60px 20px;
+  text-align: center;
+}
+
+.locked-icon {
+  font-size: 48px;
+}
+
+.locked-box h2 {
+  margin: 0;
+  font-size: 22px;
+}
+
+.locked-box p {
+  margin: 0;
+  color: var(--text-muted);
+}
+
+.locked-form {
+  display: flex;
+  gap: 10px;
+  margin-top: 8px;
+  width: 100%;
+  max-width: 320px;
+}
+
+.locked-form .input {
+  flex: 1;
+}
+
+.locked-error {
+  color: var(--danger);
+  font-size: 13.5px;
+}
+
+.locked-back {
+  margin-top: 8px;
 }

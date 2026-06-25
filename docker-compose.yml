@@ -18,6 +18,7 @@ services:
       PORT: 3001
       ADMIN_PASSWORD: change-me         # ← 改：管理员登录密码
       JWT_SECRET: change-me-to-a-long-random-string   # ← 改：随机长串
+      UNLOCK_CODE: change-me            # ← 改：加密笔记的全局授权码
       UPLOAD_DIR: /app/uploads
     volumes:
       - uploads:/app/uploads

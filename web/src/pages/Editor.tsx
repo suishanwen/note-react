@@ -9,12 +9,13 @@ import './editor.css';
 const DRAFT_KEY = 'note_draft_new';
 
 const empty: NoteInput = {
+  parent: -1,
   title: '',
   content: '',
   summary: '',
   tag: '',
   poster: '',
-  recommend: false
+  recommend: 0
 };
 
 export default function Editor() {
@@ -35,12 +36,13 @@ export default function Editor() {
   useEffect(() => {
     if (existing) {
       setForm({
+        parent: existing.parent ?? -1,
         title: existing.title ?? '',
         content: existing.content ?? '',
         summary: existing.summary ?? '',
         tag: existing.tag ?? '',
         poster: existing.poster ?? '',
-        recommend: existing.recommend === 1
+        recommend: existing.recommend ?? 0
       });
     }
   }, [existing]);
@@ -135,14 +137,24 @@ export default function Editor() {
           value={form.summary}
           onChange={(e) => update({ summary: e.target.value })}
         />
-        <label className="editor-check">
+        <div className="editor-row">
           <input
-            type="checkbox"
-            checked={form.recommend}
-            onChange={(e) => update({ recommend: e.target.checked })}
+            className="input"
+            type="number"
+            placeholder="父级笔记 id（-1 为顶级）"
+            value={form.parent}
+            onChange={(e) => update({ parent: parseInt(e.target.value, 10) || -1 })}
           />
-          置顶
-        </label>
+          <select
+            className="input"
+            value={form.recommend}
+            onChange={(e) => update({ recommend: parseInt(e.target.value, 10) })}
+          >
+            <option value={0}>普通</option>
+            <option value={1}>推荐</option>
+            <option value={-1}>加密</option>
+          </select>
+        </div>
       </div>
 
       <div className="editor-md" onPaste={handleImage} onDrop={handleImage}>

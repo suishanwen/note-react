@@ -43,6 +43,14 @@ export function login(password: string): Promise<{ token: string }> {
   });
 }
 
+// 校验全局授权码，返回解锁令牌
+export function unlock(code: string): Promise<{ token: string }> {
+  return request<{ token: string }>('/auth/unlock', {
+    method: 'POST',
+    body: JSON.stringify({ code })
+  });
+}
+
 // 上传图片返回可访问 URL
 export async function uploadImage(file: File): Promise<string> {
   const form = new FormData();

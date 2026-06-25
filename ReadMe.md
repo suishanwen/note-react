@@ -40,37 +40,30 @@ cd server && npm install && npm run dev   # 默认 3001
 cd web && npm install && npm run dev      # 默认 3000，代理 /api 与 /uploads 到 3001
 ```
 
-## 数据迁移（旧库 HTML → Markdown）
+## 笔记功能
 
-迁移脚本读旧库、把正文 HTML 转 Markdown、保留 id/时间/标签写入新库。以旧库在同一台 MySQL 为例：
+- **层级**：`parent` 存父级笔记 id（`-1` 为顶级），列表按父子关系渲染为可折叠缩进树。
+- **状态**（`recommend` 三态，编辑器下拉选择）：
+  - `0` 普通
+  - `1` 推荐（列表/详情带 ⭐ 标记，排序靠前）
+  - `-1` 加密（需授权码或管理员登录才能查看正文）
+- **加密访问**：未授权时列表仅显示标题与 🔒 图标，正文接口返回 403；输入 `UNLOCK_CODE` 授权码可解锁查看，管理员登录后默认可见全部。
+
+## 数据迁移（旧库 HTML → Markdown，自动）
+
+首次启动时 app 会自动迁移：若新库 `note` 表为空且旧库（`SRC_DB_NAME`，默认 `sw`）存在，则读旧库、把正文 HTML 转 Markdown、保留 id/时间/标签/层级/加密标记写入新库。
+
+- **幂等**：新表非空则跳过，重启不会重复迁移。
+- **只读旧库**：全程只 `SELECT` 旧库，不修改原始数据。
+- **关闭迁移**：把 compose 里 `SRC_DB_NAME` 留空即可。
+
+如需启动前预览转换效果，可手动 dry-run（不写库）：
 
 ```bash
-# ① 导出旧库 note 表
-docker exec -i 现有MySQL容器名 mysqldump -uroot -p密码 \
-  --default-character-set=utf8mb4 旧库名 note > old_note.sql
-
-# ② 导入临时库
-docker exec -i 现有MySQL容器名 mysql -uroot -p密码 \
-  -e "CREATE DATABASE IF NOT EXISTS note_old CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci"
-docker exec -i 现有MySQL容器名 mysql -uroot -p密码 note_old < old_note.sql
-
-# ③ 一次性容器跑迁移（自动装含 turndown 的完整依赖，跑完即删，不污染生产镜像）
-#    SRC_* 为旧库连接，新库连接复用 compose 里 app 的 DB_* 配置；先 dry-run 抽样预览
 docker compose run --rm \
-  -e SRC_DB_HOST=现有MySQL容器名 -e SRC_DB_USER=root -e SRC_DB_PASSWORD=密码 -e SRC_DB_NAME=note_old \
-  --entrypoint sh app -c "npm install --silent && node scripts/migrate.js --dry-run"
-
-# ④ 去掉 --dry-run 正式迁移
-docker compose run --rm \
-  -e SRC_DB_HOST=现有MySQL容器名 -e SRC_DB_USER=root -e SRC_DB_PASSWORD=密码 -e SRC_DB_NAME=note_old \
-  --entrypoint sh app -c "npm install --silent && node scripts/migrate.js"
-
-# ⑤ 清理
-docker exec -i 现有MySQL容器名 mysql -uroot -p密码 -e "DROP DATABASE note_old"
-rm old_note.sql
+  -e SRC_DB_HOST=数据库地址 -e SRC_DB_USER=root -e SRC_DB_PASSWORD=密码 -e SRC_DB_NAME=sw \
+  --entrypoint sh app -c "node scripts/migrate.js --dry-run"
 ```
-
-> 在全新（空）的 note 表上迁移；脚本保留原 id，若新库已手动建过笔记可能 id 冲突。
 
 ## 目录
 

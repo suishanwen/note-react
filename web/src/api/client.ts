@@ -1,4 +1,5 @@
 const TOKEN_KEY = 'note_token';
+const UNLOCK_KEY = 'note_unlock';
 
 export function getToken(): string | null {
   return localStorage.getItem(TOKEN_KEY);
@@ -10,6 +11,18 @@ export function setToken(token: string): void {
 
 export function clearToken(): void {
   localStorage.removeItem(TOKEN_KEY);
+}
+
+export function getUnlockToken(): string | null {
+  return localStorage.getItem(UNLOCK_KEY);
+}
+
+export function setUnlockToken(token: string): void {
+  localStorage.setItem(UNLOCK_KEY, token);
+}
+
+export function clearUnlockToken(): void {
+  localStorage.removeItem(UNLOCK_KEY);
 }
 
 export class ApiError extends Error {
@@ -28,6 +41,8 @@ export async function request<T>(path: string, options: RequestInit = {}): Promi
   }
   const token = getToken();
   if (token) headers.set('Authorization', `Bearer ${token}`);
+  const unlock = getUnlockToken();
+  if (unlock) headers.set('X-Unlock-Token', unlock);
 
   const res = await fetch(`/api${path}`, { ...options, headers });
   if (res.status === 401) {

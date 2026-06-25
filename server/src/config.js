@@ -25,7 +25,10 @@ const config = {
     // 管理员密码（明文环境变量），登录后签发 JWT
     adminPassword: process.env.ADMIN_PASSWORD || 'admin',
     jwtSecret: process.env.JWT_SECRET || 'note-dev-secret-change-me',
-    jwtExpiresIn: '7d'
+    jwtExpiresIn: '7d',
+    // 加密笔记的全局授权码，校验通过后签发解锁令牌
+    unlockCode: process.env.UNLOCK_CODE || 'unlock',
+    unlockExpiresIn: '7d'
   },
   // 上传目录与前端静态产物目录，默认相对 server 根
   uploadDir: process.env.UPLOAD_DIR || path.resolve(__dirname, '../uploads'),
