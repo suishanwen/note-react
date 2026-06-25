@@ -26,53 +26,82 @@ function normalizeRecommend(value) {
   return 0;
 }
 
-// 列表项脱敏：无权查看加密笔记时，抹除摘要并标记 locked，保留标题与层级
-function maskListRow(row, canView) {
-  if (row.recommend === ENCRYPTED && !canView) {
-    return { ...row, summary: null, tag: null, locked: true };
-  }
-  return { ...row, locked: false };
+// 基于全量行（含 id/parent/recommend）构建"有效加密"判定：
+// 笔记自身或任一祖先加密，则视为加密 —— 父级加锁，整棵子树都锁
+function makeEncryptionResolver(rows) {
+  const map = new Map();
+  for (const r of rows) map.set(r.id, r);
+  const cache = new Map();
+  const resolve = (id, seen) => {
+    if (cache.has(id)) return cache.get(id);
+    const node = map.get(id);
+    if (!node || seen.has(id)) return false;
+    seen.add(id);
+    let result;
+    if (node.recommend === ENCRYPTED) {
+      result = true;
+    } else if (node.parent != null && node.parent !== -1) {
+      result = resolve(node.parent, seen);
+    } else {
+      result = false;
+    }
+    cache.set(id, result);
+    return result;
+  };
+  return (id) => resolve(id, new Set());
 }
 
-// GET /api/notes?keyword=&tag= — 列表，支持标题/摘要关键字与标签筛选
+// 查询某笔记是否处于加密路径下（自身或祖先加密）
+async function isPathEncrypted(id) {
+  const [rows] = await pool.query('SELECT id, parent, recommend FROM note');
+  return makeEncryptionResolver(rows)(id);
+}
+
+// GET /api/notes — 列表。加密判定沿 parent 链：父级加锁则整棵子树都锁
+// 不在 SQL 层按关键字/摘要过滤，避免加密内容经搜索泄露；过滤由前端在可见数据上做
 router.get('/', canViewEncrypted, async (req, res) => {
-  const { keyword, tag } = req.query;
-  const where = [];
-  const params = [];
-  if (keyword) {
-    where.push('(title LIKE ? OR summary LIKE ?)');
-    params.push(`%${keyword}%`, `%${keyword}%`);
-  }
-  if (tag) {
-    where.push('tag LIKE ?');
-    params.push(`%${tag}%`);
-  }
-  const sql =
-    `SELECT ${LIST_FIELDS} FROM note` +
-    (where.length ? ` WHERE ${where.join(' AND ')}` : '') +
-    ' ORDER BY COALESCE(edit_time, post_time) DESC';
   try {
-    const [rows] = await pool.query(sql, params);
-    res.json(rows.map((row) => maskListRow(row, req.canViewEncrypted)));
+    const [rows] = await pool.query(
+      `SELECT ${LIST_FIELDS} FROM note ORDER BY COALESCE(edit_time, post_time) DESC`
+    );
+    const isEnc = makeEncryptionResolver(rows);
+    const result = rows.map((row) => {
+      if (isEnc(row.id) && !req.canViewEncrypted) {
+        // 加密路径下：仅暴露标题与层级，抹除摘要/标签，标记 locked
+        return {
+          id: row.id,
+          parent: row.parent,
+          title: row.title,
+          tag: null,
+          summary: null,
+          poster: null,
+          recommend: ENCRYPTED,
+          postTime: row.postTime,
+          editTime: row.editTime,
+          locked: true
+        };
+      }
+      return { ...row, locked: false };
+    });
+    res.json(result);
   } catch (err) {
     console.error('NotesRoute#list 查询失败 %s', err.message);
     res.status(500).json({ message: '查询失败' });
   }
 });
 
-// GET /api/notes/:id — 详情，加密笔记需管理员或解锁令牌
+// GET /api/notes/:id — 详情。自身或任一祖先加密，未授权一律 403
 router.get('/:id', canViewEncrypted, async (req, res) => {
   try {
+    if (!req.canViewEncrypted && (await isPathEncrypted(Number(req.params.id)))) {
+      return res.status(403).json({ message: '该笔记已加密，请登录后查看', locked: true });
+    }
     const [rows] = await pool.query(
       `SELECT ${DETAIL_FIELDS} FROM note WHERE id = ?`,
       [req.params.id]
     );
     if (!rows.length) return res.status(404).json({ message: '笔记不存在' });
-    const note = rows[0];
-    if (note.recommend === ENCRYPTED && !req.canViewEncrypted) {
-      return res.status(403).json({ message: '该笔记已加密，请输入授权码解锁', locked: true });
-    }
-    res.json(note);
+    res.json(rows[0]);
   } catch (err) {
     console.error('NotesRoute#detail 查询失败 %s', err.message);
     res.status(500).json({ message: '查询失败' });
