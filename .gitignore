@@ -1,5 +1,9 @@
 node_modules/
+dist/
 .idea/
 .vscode/
-server/.env
-
+.env
+*.log
+*.tsbuildinfo
+server/uploads/
+server/public/

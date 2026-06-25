@@ -1,0 +1,20 @@
+.list-search {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 24px;
+}
+
+.list-search .input {
+  flex: 1;
+}
+
+.list-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.skeleton-card {
+  height: 112px;
+}

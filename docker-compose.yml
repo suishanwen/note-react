@@ -1,0 +1,28 @@
+# 一键启动：前后端打包在 app 一个容器（后端托管前端静态产物）
+# 启动时自动建库、建表；若新库为空且旧库存在，自动把旧库 HTML 迁移为 Markdown
+#
+# 改下面带【← 改】的值，然后：docker compose up -d --build
+services:
+  app:
+    build: .
+    restart: unless-stopped
+    environment:
+      # ── 数据库远程连接 ────────────────────────
+      DB_HOST: your-db-host.com         # ← 改：数据库域名或 IP
+      DB_PORT: 3306
+      DB_USER: root
+      DB_PASSWORD: your-db-password     # ← 改：数据库密码
+      DB_NAME: note                     # 新库（自动创建），应用使用
+      SRC_DB_NAME: sw                   # 旧库名；首次启动从这里自动迁移。留空则关闭迁移
+      # ── 应用配置 ──────────────────────────────
+      PORT: 3001
+      ADMIN_PASSWORD: change-me         # ← 改：管理员登录密码
+      JWT_SECRET: change-me-to-a-long-random-string   # ← 改：随机长串
+      UPLOAD_DIR: /app/uploads
+    volumes:
+      - uploads:/app/uploads
+    ports:
+      - '3001:3001'                     # 宿主机:容器，按需改宿主机端口
+
+volumes:
+  uploads:
