@@ -1,3 +1,8 @@
+.detail-page {
+  max-width: 720px;
+  margin: 0 auto;
+}
+
 .detail-header {
   margin-bottom: 28px;
 }

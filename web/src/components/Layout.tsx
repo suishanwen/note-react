@@ -67,7 +67,7 @@ export default function Layout({ children }: { children: ReactNode }) {
           {tip}
         </div>
       )}
-      <main className="content container">{children}</main>
+      <main className="content">{children}</main>
       <Footer />
     </div>
   );

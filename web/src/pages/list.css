@@ -1,3 +1,9 @@
+/* 列表是文档树，比阅读页更宽 */
+.list-page {
+  max-width: 920px;
+  margin: 0 auto;
+}
+
 .list-search {
   display: flex;
   align-items: center;
@@ -28,6 +34,12 @@
   color: var(--danger);
   font-size: 13px;
   white-space: nowrap;
+}
+
+.list-hint {
+  font-size: 12.5px;
+  color: var(--text-faint);
+  margin: 0 0 10px 2px;
 }
 
 .list-grid {

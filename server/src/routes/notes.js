@@ -50,7 +50,7 @@ router.get('/', canViewEncrypted, async (req, res) => {
   const sql =
     `SELECT ${LIST_FIELDS} FROM note` +
     (where.length ? ` WHERE ${where.join(' AND ')}` : '') +
-    ' ORDER BY recommend DESC, post_time DESC';
+    ' ORDER BY (recommend = 1) DESC, COALESCE(edit_time, post_time) DESC';
   try {
     const [rows] = await pool.query(sql, params);
     res.json(rows.map((row) => maskListRow(row, req.canViewEncrypted)));
@@ -131,6 +131,24 @@ router.put('/:id', auth, async (req, res) => {
   } catch (err) {
     console.error('NotesRoute#update 更新失败 %s', err.message);
     res.status(500).json({ message: '更新失败' });
+  }
+});
+
+// PATCH /api/notes/:id/parent — 仅调整父级（拖拽改层级用），不改 edit_time 避免排序跳动
+router.patch('/:id/parent', auth, async (req, res) => {
+  const id = Number(req.params.id);
+  const parent = req.body?.parent ?? -1;
+  // 防止把节点挂到自己下面
+  if (Number(parent) === id) {
+    return res.status(400).json({ message: '不能将笔记设为自身的子级' });
+  }
+  try {
+    const [result] = await pool.query('UPDATE note SET parent=? WHERE id=?', [parent, id]);
+    if (!result.affectedRows) return res.status(404).json({ message: '笔记不存在' });
+    res.json({ id });
+  } catch (err) {
+    console.error('NotesRoute#setParent 调整层级失败 %s', err.message);
+    res.status(500).json({ message: '调整层级失败' });
   }
 });
 

@@ -134,9 +134,9 @@ button {
   border-color: var(--accent);
 }
 
-/* 容器 */
+/* 容器（顶栏等通用） */
 .container {
-  max-width: var(--maxw);
+  max-width: 920px;
   margin: 0 auto;
   padding: 0 20px;
 }
@@ -200,4 +200,15 @@ button {
   flex-direction: column;
   gap: 12px;
   color: var(--text-muted);
+}
+
+/* 移动端：缩小容器边距与按钮，避免拥挤 */
+@media (max-width: 640px) {
+  .container {
+    padding: 0 14px;
+  }
+  .btn {
+    padding: 7px 12px;
+    font-size: 13px;
+  }
 }

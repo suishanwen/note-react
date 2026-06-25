@@ -1,7 +1,8 @@
 import { useMemo, useState } from 'react';
 import { useQuery, useQueryClient, useMutation } from '@tanstack/react-query';
-import { fetchNotes, unlock as unlockApi } from '../api/notes';
+import { fetchNotes, unlock as unlockApi, setNoteParent } from '../api/notes';
 import { getUnlockToken, setUnlockToken, clearUnlockToken } from '../api/client';
+import { useAuth } from '../auth';
 import { buildTree, filterTree } from '../utils/tree';
 import { ENCRYPTED } from '../types';
 import NoteTree from '../components/NoteTree';
@@ -14,11 +15,21 @@ export default function List() {
   const [showUnlock, setShowUnlock] = useState(false);
   const [password, setPassword] = useState('');
   const queryClient = useQueryClient();
+  const { isAuthed } = useAuth();
 
   const { data, isLoading, isError, error } = useQuery({
     queryKey: ['notes'],
     queryFn: () => fetchNotes()
   });
+
+  // 拖拽改层级：登录后可用，成功后刷新列表
+  const moveMutation = useMutation({
+    mutationFn: ({ id, parent }: { id: number; parent: number }) => setNoteParent(id, parent),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['notes'] })
+  });
+
+  // 拖拽仅在无搜索/筛选时启用，避免在过滤视图里改结构产生困惑
+  const canDrag = isAuthed && !keyword.trim() && !activeTag;
 
   const unlockMutation = useMutation({
     mutationFn: () => unlockApi(password),
@@ -122,7 +133,18 @@ export default function List() {
         <div className="center-box">暂无笔记</div>
       )}
 
-      {!isLoading && tree.length > 0 && <NoteTree nodes={tree} onTagClick={setActiveTag} />}
+      {canDrag && tree.length > 0 && (
+        <p className="list-hint">已登录：拖拽笔记可调整父子层级</p>
+      )}
+
+      {!isLoading && tree.length > 0 && (
+        <NoteTree
+          nodes={tree}
+          draggable={canDrag}
+          onTagClick={setActiveTag}
+          onMove={(id, parent) => moveMutation.mutate({ id, parent })}
+        />
+      )}
     </div>
   );
 }

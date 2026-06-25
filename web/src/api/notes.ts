@@ -36,6 +36,14 @@ export function deleteNote(id: number): Promise<{ id: number }> {
   return request<{ id: number }>(`/notes/${id}`, { method: 'DELETE' });
 }
 
+// 仅调整父级（拖拽改层级）
+export function setNoteParent(id: number, parent: number): Promise<{ id: number }> {
+  return request<{ id: number }>(`/notes/${id}/parent`, {
+    method: 'PATCH',
+    body: JSON.stringify({ parent })
+  });
+}
+
 export function login(password: string): Promise<{ token: string }> {
   return request<{ token: string }>('/auth/login', {
     method: 'POST',

@@ -5,36 +5,58 @@
 }
 
 .tree-children {
-  margin-left: 22px;
-  padding-left: 10px;
+  margin-left: 14px;
+  padding-left: 8px;
   border-left: 1px solid var(--border);
 }
 
 .tree-item {
-  margin: 2px 0;
+  margin: 0;
 }
 
 .tree-row {
   display: flex;
   align-items: center;
-  gap: 8px;
-  padding: 8px 10px;
+  gap: 6px;
+  padding: 5px 8px;
   border-radius: var(--radius-sm);
   transition: background var(--transition);
+  border: 1px solid transparent;
 }
 
 .tree-row:hover {
   background: var(--bg-subtle);
 }
 
+.tree-dragging {
+  opacity: 0.4;
+}
+
+/* 拖拽放置目标高亮 */
+.tree-drop-active {
+  background: var(--accent-soft) !important;
+  border-color: var(--accent);
+}
+
+.tree-root-drop {
+  margin-bottom: 10px;
+  padding: 10px;
+  text-align: center;
+  font-size: 13px;
+  color: var(--accent);
+  border: 1px dashed var(--accent);
+  border-radius: var(--radius-sm);
+  background: var(--bg-subtle);
+}
+
 .tree-toggle {
   flex: none;
-  width: 22px;
-  height: 22px;
+  width: 20px;
+  height: 20px;
   border: none;
   background: none;
   color: var(--text-faint);
-  font-size: 12px;
+  font-size: 11px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -48,8 +70,7 @@
 
 .tree-toggle-empty {
   cursor: default;
-  color: var(--text-faint);
-  opacity: 0.4;
+  opacity: 0.35;
 }
 
 .tree-toggle-empty:hover {
@@ -61,22 +82,32 @@
   flex: 1;
   min-width: 0;
   display: flex;
-  flex-direction: column;
-  gap: 2px;
+  align-items: baseline;
+  gap: 10px;
   cursor: pointer;
+  overflow: hidden;
 }
 
 .tree-title {
-  font-size: 15px;
-  font-weight: 550;
-  color: var(--text);
-  display: flex;
+  display: inline-flex;
   align-items: center;
-  gap: 6px;
+  gap: 5px;
+  font-size: 14.5px;
+  font-weight: 500;
+  color: var(--text);
+  flex: none;
+  max-width: 100%;
+}
+
+.tree-title-text {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .tree-icon {
-  font-size: 12px;
+  font-size: 11px;
+  flex: none;
 }
 
 .tree-summary {
@@ -85,6 +116,8 @@
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  flex: 1;
+  min-width: 0;
 }
 
 .tree-meta {
@@ -94,13 +127,26 @@
   gap: 6px;
 }
 
+.tree-meta .tag {
+  font-size: 11px;
+  padding: 1px 8px;
+}
+
 .tree-time {
-  font-size: 12px;
+  font-size: 11.5px;
   color: var(--text-faint);
   white-space: nowrap;
 }
 
-@media (max-width: 600px) {
+/* 移动端：隐藏摘要与标签，保留标题树和时间，加大点击区 */
+@media (max-width: 640px) {
+  .tree-row {
+    padding: 9px 6px;
+    gap: 4px;
+  }
+  .tree-title {
+    font-size: 15px;
+  }
   .tree-summary {
     display: none;
   }
@@ -108,6 +154,12 @@
     display: none;
   }
   .tree-children {
-    margin-left: 12px;
+    margin-left: 8px;
+    padding-left: 6px;
+  }
+  .tree-toggle {
+    width: 26px;
+    height: 26px;
+    font-size: 12px;
   }
 }

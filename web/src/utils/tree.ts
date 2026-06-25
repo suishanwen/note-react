@@ -31,6 +31,16 @@ export function buildTree(notes: NoteSummary[]): NoteNode[] {
   return roots;
 }
 
+// 判断 maybeDescendantId 是否在 node 的子孙中（拖拽防环用）
+export function isDescendant(node: NoteNode, maybeDescendantId: number): boolean {
+  for (const child of node.children) {
+    if (child.id === maybeDescendantId || isDescendant(child, maybeDescendantId)) {
+      return true;
+    }
+  }
+  return false;
+}
+
 // 过滤树：保留命中节点及其祖先链；命中的判定由 predicate 决定
 export function filterTree(nodes: NoteNode[], predicate: (n: NoteNode) => boolean): NoteNode[] {
   const result: NoteNode[] = [];
