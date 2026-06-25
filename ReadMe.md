@@ -71,11 +71,15 @@ docker compose run --rm \
 
 由于 app 跑在容器内、无法重建自身，更新流程解耦为：接口写一个触发标记文件 → 宿主机常驻脚本 `update-watcher.sh` 监听到后执行 `git pull && docker compose up -d --build`。容器不接触宿主机 docker，无提权风险。
 
-部署时在宿主机项目根目录后台启动监听脚本（一次即可，建议配 systemd 开机自启）：
+部署时在宿主机项目根目录启动监听脚本（脚本自带后台化，无需 nohup）：
 
 ```bash
-nohup ./update-watcher.sh > update-watcher.log 2>&1 &
+./update-watcher.sh            # 启动/重启（默认）
+./update-watcher.sh status     # 查看状态
+./update-watcher.sh stop       # 停止
 ```
+
+重复执行 `./update-watcher.sh` 即重启（停掉旧进程再起新的）。运行日志见 `update-watcher.log`。
 
 用 curl 触发示例：
 
