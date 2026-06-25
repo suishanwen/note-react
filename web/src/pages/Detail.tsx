@@ -1,8 +1,7 @@
 import { useState } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { fetchNote, deleteNote, unlock as unlockApi } from '../api/notes';
-import { setUnlockToken } from '../api/client';
+import { fetchNote, deleteNote } from '../api/notes';
 import { ApiError } from '../api/client';
 import { useAuth } from '../auth';
 import Markdown from '../components/Markdown';
@@ -16,10 +15,9 @@ export default function Detail() {
   const queryClient = useQueryClient();
   const { isAuthed } = useAuth();
   const [confirming, setConfirming] = useState(false);
-  const [password, setPassword] = useState('');
 
   const { data: note, isLoading, isError, error } = useQuery({
-    queryKey: ['note', id],
+    queryKey: ['note', id, isAuthed],
     queryFn: () => fetchNote(id!),
     enabled: !!id,
     retry: false
@@ -33,15 +31,6 @@ export default function Detail() {
     }
   });
 
-  const unlockMutation = useMutation({
-    mutationFn: () => unlockApi(password),
-    onSuccess: (res) => {
-      setUnlockToken(res.token);
-      setPassword('');
-      queryClient.invalidateQueries({ queryKey: ['note', id] });
-    }
-  });
-
   if (isLoading) {
     return (
       <div className="detail-page">
@@ -51,36 +40,21 @@ export default function Detail() {
     );
   }
 
-  // 加密笔记未解锁：展示授权码输入
+  // 加密笔记：未登录无法查看，引导去登录
   if (isError && error instanceof ApiError && error.status === 403) {
     return (
       <div className="detail-page">
         <div className="locked-box">
           <div className="locked-icon">🔒</div>
           <h2>该笔记已加密</h2>
-          <p>请输入管理员密码解锁查看</p>
-          <form
-            className="locked-form"
-            onSubmit={(e) => {
-              e.preventDefault();
-              if (password) unlockMutation.mutate();
-            }}
+          <p>请登录管理员账号后查看</p>
+          <Link
+            to="/login"
+            state={{ from: `/note/${id}` }}
+            className="btn btn-primary"
           >
-            <input
-              className="input"
-              type="password"
-              placeholder="管理员密码"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              autoFocus
-            />
-            <button className="btn btn-primary" disabled={unlockMutation.isPending}>
-              {unlockMutation.isPending ? '验证中…' : '解锁'}
-            </button>
-          </form>
-          {unlockMutation.isError && (
-            <div className="locked-error">{(unlockMutation.error as Error).message}</div>
-          )}
+            去登录
+          </Link>
           <Link to="/" className="btn locked-back">
             ← 返回列表
           </Link>

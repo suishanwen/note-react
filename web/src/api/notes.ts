@@ -51,14 +51,6 @@ export function login(password: string): Promise<{ token: string }> {
   });
 }
 
-// 凭管理员密码解锁加密笔记，返回解锁令牌
-export function unlock(password: string): Promise<{ token: string }> {
-  return request<{ token: string }>('/auth/unlock', {
-    method: 'POST',
-    body: JSON.stringify({ password })
-  });
-}
-
 // 触发宿主机远程更新（拉代码+重建+重启）
 export function triggerUpdate(): Promise<{ message: string }> {
   return request<{ message: string }>('/admin/update', { method: 'POST' });

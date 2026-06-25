@@ -23,21 +23,10 @@ export function auth(req, res, next) {
   next();
 }
 
-// 标记是否有权查看加密笔记：管理员 JWT 或有效解锁令牌（X-Unlock-Token），不拦截请求
+// 标记是否有权查看加密笔记：仅管理员登录可见，不拦截请求
 export function canViewEncrypted(req, res, next) {
   const payload = verifyBearer(req);
   req.isAdmin = payload?.role === 'admin';
   req.canViewEncrypted = req.isAdmin;
-  if (!req.canViewEncrypted) {
-    const unlock = req.headers['x-unlock-token'];
-    if (unlock) {
-      try {
-        jwt.verify(unlock, config.auth.jwtSecret);
-        req.canViewEncrypted = true;
-      } catch {
-        // 解锁令牌无效，保持不可见
-      }
-    }
-  }
   next();
 }

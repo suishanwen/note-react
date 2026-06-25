@@ -1,24 +1,20 @@
 import { useMemo, useState } from 'react';
 import { useQuery, useQueryClient, useMutation } from '@tanstack/react-query';
-import { fetchNotes, unlock as unlockApi, setNoteParent } from '../api/notes';
-import { getUnlockToken, setUnlockToken, clearUnlockToken } from '../api/client';
+import { fetchNotes, setNoteParent } from '../api/notes';
 import { useAuth } from '../auth';
 import { buildTree, filterTree } from '../utils/tree';
-import { ENCRYPTED } from '../types';
 import NoteTree from '../components/NoteTree';
 import './list.css';
 
 export default function List() {
   const [keyword, setKeyword] = useState('');
   const [activeTag, setActiveTag] = useState('');
-  const [unlocked, setUnlocked] = useState(() => !!getUnlockToken());
-  const [showUnlock, setShowUnlock] = useState(false);
-  const [password, setPassword] = useState('');
   const queryClient = useQueryClient();
   const { isAuthed } = useAuth();
 
+  // 列表随登录态变化重新拉取：登录后才返回加密笔记完整内容
   const { data, isLoading, isError, error } = useQuery({
-    queryKey: ['notes'],
+    queryKey: ['notes', isAuthed],
     queryFn: () => fetchNotes()
   });
 
@@ -30,28 +26,6 @@ export default function List() {
 
   // 拖拽仅在无搜索/筛选时启用，避免在过滤视图里改结构产生困惑
   const canDrag = isAuthed && !keyword.trim() && !activeTag;
-
-  const unlockMutation = useMutation({
-    mutationFn: () => unlockApi(password),
-    onSuccess: (res) => {
-      setUnlockToken(res.token);
-      setUnlocked(true);
-      setShowUnlock(false);
-      setPassword('');
-      queryClient.invalidateQueries({ queryKey: ['notes'] });
-    }
-  });
-
-  const relock = () => {
-    clearUnlockToken();
-    setUnlocked(false);
-    queryClient.invalidateQueries({ queryKey: ['notes'] });
-  };
-
-  const hasEncrypted = useMemo(
-    () => (data ?? []).some((n) => n.recommend === ENCRYPTED),
-    [data]
-  );
 
   // 关键字、标签过滤后组装成树，保留命中节点的祖先链
   const tree = useMemo(() => {
@@ -82,42 +56,7 @@ export default function List() {
             #{activeTag} ✕
           </button>
         )}
-        {hasEncrypted &&
-          (unlocked ? (
-            <button className="btn" onClick={relock} title="重新锁定加密笔记">
-              🔓 已解锁
-            </button>
-          ) : (
-            <button className="btn" onClick={() => setShowUnlock((v) => !v)}>
-              🔒 解锁
-            </button>
-          ))}
       </div>
-
-      {showUnlock && !unlocked && (
-        <form
-          className="unlock-bar"
-          onSubmit={(e) => {
-            e.preventDefault();
-            if (password) unlockMutation.mutate();
-          }}
-        >
-          <input
-            className="input"
-            type="password"
-            placeholder="输入管理员密码解锁加密笔记"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            autoFocus
-          />
-          <button className="btn btn-primary" disabled={unlockMutation.isPending}>
-            {unlockMutation.isPending ? '验证中…' : '解锁'}
-          </button>
-          {unlockMutation.isError && (
-            <span className="unlock-error">{(unlockMutation.error as Error).message}</span>
-          )}
-        </form>
-      )}
 
       {isLoading && (
         <div className="list-grid">

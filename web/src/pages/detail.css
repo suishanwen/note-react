@@ -74,23 +74,6 @@
   color: var(--text-muted);
 }
 
-.locked-form {
-  display: flex;
-  gap: 10px;
-  margin-top: 8px;
-  width: 100%;
-  max-width: 320px;
-}
-
-.locked-form .input {
-  flex: 1;
-}
-
-.locked-error {
-  color: var(--danger);
-  font-size: 13.5px;
-}
-
-.locked-back {
+.locked-box .btn {
   margin-top: 8px;
 }
