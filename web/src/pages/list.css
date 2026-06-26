@@ -43,3 +43,10 @@
   height: 38px;
   border-radius: var(--radius-sm);
 }
+
+/* 全面屏：列表树铺满，弱化外框 */
+@media (max-width: 640px) {
+  .list-grid {
+    padding: 6px;
+  }
+}

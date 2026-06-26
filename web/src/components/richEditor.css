@@ -1,0 +1,128 @@
+.rich-editor {
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+  background: var(--bg-elevated);
+}
+
+.rich-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 2px;
+  padding: 6px 8px;
+  background: var(--bg-subtle);
+  border-bottom: 1px solid var(--border);
+  position: sticky;
+  top: 52px;
+  z-index: 2;
+}
+
+.rich-btn {
+  min-width: 30px;
+  height: 30px;
+  padding: 0 8px;
+  border: none;
+  background: none;
+  color: var(--text-muted);
+  font-size: 13px;
+  border-radius: 6px;
+  transition: background var(--transition), color var(--transition);
+}
+
+.rich-btn:hover {
+  background: var(--border);
+  color: var(--text);
+}
+
+.rich-btn.active {
+  background: var(--accent-soft);
+  color: var(--accent);
+}
+
+.rich-sep {
+  width: 1px;
+  height: 18px;
+  background: var(--border-strong);
+  margin: 0 4px;
+}
+
+/* 编辑区：套 markdown-body 样式，所见即所得 */
+.rich-editor-content {
+  padding: 18px 20px;
+  min-height: 380px;
+  max-height: 70vh;
+  overflow-y: auto;
+}
+
+.rich-editor-content .ProseMirror {
+  outline: none;
+  min-height: 340px;
+}
+
+.rich-editor-content .ProseMirror:focus {
+  outline: none;
+}
+
+/* 表格可视化编辑：选中单元格高亮、列宽拖拽手柄 */
+.rich-editor-content .ProseMirror table {
+  border-collapse: collapse;
+  width: 100%;
+  margin: 1em 0;
+  table-layout: fixed;
+}
+
+.rich-editor-content .ProseMirror th,
+.rich-editor-content .ProseMirror td {
+  border: 1px solid var(--border-strong);
+  padding: 7px 10px;
+  position: relative;
+  vertical-align: top;
+}
+
+.rich-editor-content .ProseMirror th {
+  background: var(--bg-subtle);
+  font-weight: 600;
+}
+
+.rich-editor-content .ProseMirror .selectedCell::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: var(--accent-soft);
+  opacity: 0.5;
+  pointer-events: none;
+}
+
+.rich-editor-content .ProseMirror .column-resize-handle {
+  position: absolute;
+  right: -2px;
+  top: 0;
+  bottom: 0;
+  width: 4px;
+  background: var(--accent);
+  cursor: col-resize;
+}
+
+.rich-editor-content .ProseMirror img {
+  max-width: 100%;
+  height: auto;
+  border-radius: var(--radius-sm);
+}
+
+.rich-editor-content .ProseMirror p.is-editor-empty:first-child::before {
+  content: '开始输入正文…';
+  color: var(--text-faint);
+  float: left;
+  height: 0;
+  pointer-events: none;
+}
+
+@media (max-width: 640px) {
+  .rich-toolbar {
+    top: 50px;
+  }
+  .rich-editor-content {
+    padding: 14px 12px;
+  }
+}

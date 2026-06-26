@@ -3,6 +3,7 @@ import { useQuery, useQueryClient, useMutation } from '@tanstack/react-query';
 import { fetchNotes, setNoteParent } from '../api/notes';
 import { useAuth } from '../auth';
 import { buildTree, filterTree } from '../utils/tree';
+import { useMediaQuery } from '../hooks/useMediaQuery';
 import NoteTree from '../components/NoteTree';
 import './list.css';
 
@@ -11,6 +12,8 @@ export default function List() {
   const [activeTag, setActiveTag] = useState('');
   const queryClient = useQueryClient();
   const { isAuthed } = useAuth();
+  // 移动端禁用拖拽，避免干扰滚动/手势
+  const isMobile = useMediaQuery('(max-width: 640px)');
 
   // 列表随登录态变化重新拉取：登录后才返回加密笔记完整内容
   const { data, isLoading, isError, error } = useQuery({
@@ -24,8 +27,8 @@ export default function List() {
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ['notes'] })
   });
 
-  // 拖拽仅在无搜索/筛选时启用，避免在过滤视图里改结构产生困惑
-  const canDrag = isAuthed && !keyword.trim() && !activeTag;
+  // 拖拽仅在桌面端、登录、无搜索/筛选时启用
+  const canDrag = isAuthed && !isMobile && !keyword.trim() && !activeTag;
   // 搜索/筛选时默认展开，以便看到命中的子节点；平时默认收起
   const isFiltering = !!keyword.trim() || !!activeTag;
 

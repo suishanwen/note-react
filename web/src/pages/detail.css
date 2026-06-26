@@ -100,10 +100,20 @@
 }
 
 @media (max-width: 640px) {
+  /* 全面屏阅读：去卡片外框/圆角/阴影，正文铺满 */
   .detail-page {
-    padding: 24px 18px;
+    padding: 4px 2px 24px;
+    background: none;
+    border: none;
+    border-radius: 0;
+    box-shadow: none;
   }
   .detail-title {
     font-size: 24px;
+  }
+  /* 移动端正文不再限宽，铺满可用宽度 */
+  .detail-page .detail-header,
+  .detail-page .markdown-body > * {
+    max-width: none;
   }
 }

@@ -5,14 +5,17 @@ import MDEditor, { commands } from '@uiw/react-md-editor';
 import { fetchNote, createNote, updateNote, uploadImage } from '../api/notes';
 import type { NoteInput } from '../types';
 import Markdown from '../components/Markdown';
+import RichEditor from '../components/RichEditor';
 import LiveEditor from '../components/LiveEditor';
 import { isLiveOnly, extractLive, wrapLive } from '../utils/liveBlock';
+import { toEditableHtml } from '../utils/content';
 import './editor.css';
 
 // 编辑器预览复用正文渲染：```live 块在预览里即沙箱运行，所见即所得
 const previewRender = (source: string) => <Markdown content={source} />;
 
-type EditMode = 'markdown' | 'live';
+// 文档(所见即所得) / 源码(Markdown·HTML) / 应用(可运行 live)
+type EditMode = 'rich' | 'source' | 'live';
 
 const DRAFT_KEY = 'note_draft_new';
 
@@ -32,7 +35,7 @@ export default function Editor() {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const [form, setForm] = useState<NoteInput>(empty);
-  const [mode, setMode] = useState<EditMode>('markdown');
+  const [mode, setMode] = useState<EditMode>('rich');
   const [errorMsg, setErrorMsg] = useState('');
 
   // 编辑模式：拉取原数据填充
@@ -54,8 +57,8 @@ export default function Editor() {
         poster: existing.poster ?? '',
         recommend: existing.recommend ?? 0
       });
-      // content 为单个 live 块 → 自动进入应用模式
-      setMode(isLiveOnly(content) ? 'live' : 'markdown');
+      // live 块→应用模式；其余默认所见即所得文档模式
+      setMode(isLiveOnly(content) ? 'live' : 'rich');
     }
   }, [existing]);
 
@@ -87,11 +90,16 @@ export default function Editor() {
     if (next === mode) return;
     setForm((f) => {
       if (next === 'live') {
-        // 文档→应用：非 live 则把现有正文作为初始源码包进 live 块
+        // → 应用：非 live 则把现有正文作为初始源码包进 live 块
         return { ...f, content: isLiveOnly(f.content) ? f.content : wrapLive(f.content) };
       }
-      // 应用→文档：还原为 ```live 文本，可继续按 Markdown 编辑
-      return f;
+      if (next === 'rich') {
+        // → 文档：从 live 还原内部源码；Markdown 转 HTML 供富文本编辑
+        const raw = isLiveOnly(f.content) ? extractLive(f.content) : f.content;
+        return { ...f, content: toEditableHtml(raw) };
+      }
+      // → 源码：从 live 还原内部源码，其余原样
+      return { ...f, content: isLiveOnly(f.content) ? extractLive(f.content) : f.content };
     });
     setMode(next);
   };
@@ -187,25 +195,22 @@ export default function Editor() {
       </div>
 
       <div className="editor-mode">
-        <button
-          type="button"
-          className={mode === 'markdown' ? 'active' : ''}
-          onClick={() => switchMode('markdown')}
-        >
-          Markdown 文档
+        <button type="button" className={mode === 'rich' ? 'active' : ''} onClick={() => switchMode('rich')}>
+          文档
         </button>
-        <button
-          type="button"
-          className={mode === 'live' ? 'active' : ''}
-          onClick={() => switchMode('live')}
-        >
+        <button type="button" className={mode === 'source' ? 'active' : ''} onClick={() => switchMode('source')}>
+          源码
+        </button>
+        <button type="button" className={mode === 'live' ? 'active' : ''} onClick={() => switchMode('live')}>
           可运行应用
         </button>
       </div>
 
-      {mode === 'live' ? (
-        <LiveEditor value={extractLive(form.content)} onChange={onLiveChange} />
-      ) : (
+      {mode === 'rich' && (
+        <RichEditor value={toEditableHtml(form.content)} onChange={(html) => update({ content: html })} />
+      )}
+
+      {mode === 'source' && (
         <div className="editor-md" onPaste={handleImage} onDrop={handleImage}>
           <MDEditor
             value={form.content}
@@ -218,10 +223,14 @@ export default function Editor() {
         </div>
       )}
 
+      {mode === 'live' && <LiveEditor value={extractLive(form.content)} onChange={onLiveChange} />}
+
       <p className="editor-hint">
-        {mode === 'live'
-          ? '左侧编辑 HTML/JS，右侧沙箱实时预览；脚本与主站隔离，无法访问登录凭证'
-          : '支持 Markdown，粘贴或拖拽图片自动上传；切到「可运行应用」可写带 JS 的交互内容'}
+        {mode === 'rich' &&
+          '所见即所得：工具栏可视化编辑表格（增删行列）、标题、列表、图片、链接'}
+        {mode === 'source' && '源码模式：直接写 Markdown / HTML，粘贴或拖拽图片自动上传'}
+        {mode === 'live' &&
+          '左侧编辑 HTML/JS，右侧沙箱实时预览；脚本与主站隔离，无法访问登录凭证'}
       </p>
 
       {errorMsg && <div className="editor-error">{errorMsg}</div>}
