@@ -1,4 +1,4 @@
-import ReactMarkdown from 'react-markdown';
+import ReactMarkdown, { defaultUrlTransform } from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import rehypeRaw from 'rehype-raw';
 import rehypeHighlight from 'rehype-highlight';
@@ -45,6 +45,13 @@ const components = {
   }
 };
 
+// react-markdown v9 默认 urlTransform 会剥除 data: 等非 http/https 协议，
+// 导致 base64 图片 src 被清空；放行 data: 图片（安全性由 rehypeSanitize 兜底）
+function urlTransform(url: string): string {
+  if (url.startsWith('data:image/')) return url;
+  return defaultUrlTransform(url);
+}
+
 export default function Markdown({ content }: { content: string }) {
   return (
     <div className="markdown-body">
@@ -56,6 +63,7 @@ export default function Markdown({ content }: { content: string }) {
           [rehypeHighlight, { ignoreMissing: true }]
         ]}
         components={components}
+        urlTransform={urlTransform}
       >
         {content}
       </ReactMarkdown>
