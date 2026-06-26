@@ -44,9 +44,12 @@
   border-radius: var(--radius-sm);
 }
 
-/* 全面屏：列表树铺满，弱化外框 */
+/* 全面屏：列表树铺满，去左右外框，最大化可用宽度 */
 @media (max-width: 640px) {
   .list-grid {
-    padding: 6px;
+    padding: 6px 4px;
+    border-left: none;
+    border-right: none;
+    border-radius: 0;
   }
 }

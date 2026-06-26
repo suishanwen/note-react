@@ -105,10 +105,10 @@
     width: 34px;
     height: 34px;
   }
-  /* 内容区贴边铺满，左右仅留安全区 */
+  /* 内容区贴边铺满：左右零边距，仅保留刘海安全区（竖屏为 0） */
   .content {
-    padding: 14px max(10px, env(safe-area-inset-left)) calc(20px + env(safe-area-inset-bottom))
-      max(10px, env(safe-area-inset-right));
+    padding: 12px env(safe-area-inset-left) calc(16px + env(safe-area-inset-bottom))
+      env(safe-area-inset-right);
   }
 }
 

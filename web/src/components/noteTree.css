@@ -230,6 +230,10 @@
 @media (max-width: 640px) {
   .note-tree-wrap {
     padding: 4px;
+    /* 全面屏：去左右边框圆角，铺满屏宽 */
+    border-left: none;
+    border-right: none;
+    border-radius: 0;
   }
   .tree-row {
     padding: 9px 8px;

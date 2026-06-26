@@ -100,9 +100,9 @@
 }
 
 @media (max-width: 640px) {
-  /* 全面屏阅读：去卡片外框/圆角/阴影，正文铺满 */
+  /* 全面屏阅读：去卡片外框/圆角/阴影，正文铺满，仅留极窄阅读边距 */
   .detail-page {
-    padding: 4px 2px 24px;
+    padding: 4px 10px 24px;
     background: none;
     border: none;
     border-radius: 0;
