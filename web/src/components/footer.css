@@ -1,7 +1,7 @@
 .footer {
   border-top: 1px solid var(--border);
-  margin-top: 64px;
-  padding: 28px max(20px, var(--safe-right)) calc(40px + var(--safe-bottom))
+  margin-top: 40px;
+  padding: 14px max(20px, var(--safe-right)) calc(16px + var(--safe-bottom))
     max(20px, var(--safe-left));
   background: var(--bg);
   text-align: center;
@@ -11,9 +11,9 @@
 
 .footer-links {
   display: flex;
-  gap: 20px;
+  gap: 18px;
   justify-content: center;
-  margin-bottom: 10px;
+  margin-bottom: 6px;
 }
 
 .footer-links a {
@@ -26,9 +26,9 @@
 
 @media (max-width: 640px) {
   .footer {
-    margin-top: 32px;
+    margin-top: 24px;
     background: var(--bg-elevated);
-    padding-top: 22px;
-    padding-bottom: calc(28px + var(--safe-bottom));
+    padding-top: 12px;
+    padding-bottom: calc(12px + var(--safe-bottom));
   }
 }
