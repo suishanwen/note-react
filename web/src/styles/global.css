@@ -58,6 +58,9 @@ html,
 body {
   margin: 0;
   padding: 0;
+  /* 根画布也填主题背景：消除状态栏/回弹区的白边，实现全面屏 */
+  background: var(--bg);
+  min-height: 100%;
 }
 
 body {
