@@ -48,18 +48,20 @@ export default function Editor() {
 
   useEffect(() => {
     if (existing) {
-      const content = existing.content ?? '';
+      const raw = existing.content ?? '';
+      const live = isLiveOnly(raw);
+      // 文档模式以 HTML 为载体，加载时一次性把 Markdown 转 HTML（live 保留原样），
+      // 之后 content 始终是 HTML，避免编辑器每次渲染重复转换造成循环/白屏
       setForm({
         parent: existing.parent ?? -1,
         title: existing.title ?? '',
-        content,
+        content: live ? raw : toEditableHtml(raw),
         summary: existing.summary ?? '',
         tag: existing.tag ?? '',
         poster: existing.poster ?? '',
         recommend: existing.recommend ?? 0
       });
-      // live 块→应用模式；其余默认所见即所得文档模式
-      setMode(isLiveOnly(content) ? 'live' : 'rich');
+      setMode(live ? 'live' : 'rich');
     }
   }, [existing]);
 
@@ -208,7 +210,7 @@ export default function Editor() {
       </div>
 
       {mode === 'rich' && (
-        <RichEditor value={toEditableHtml(form.content)} onChange={(html) => update({ content: html })} />
+        <RichEditor value={form.content} onChange={(html) => update({ content: html })} />
       )}
 
       {mode === 'source' && (

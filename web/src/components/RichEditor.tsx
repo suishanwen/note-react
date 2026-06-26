@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 import { useEditor, EditorContent, type Editor } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
 import Image from '@tiptap/extension-image';
@@ -14,6 +14,10 @@ interface Props {
 
 // 所见即所得富文本编辑器：可视化编辑表格、标题、列表、图片等，正文以 HTML 存储
 export default function RichEditor({ value, onChange }: Props) {
+  // 记录最近一次"我方回写"的 HTML：editor.getHTML() 会规范化（如 data:URI 图片），
+  // 直接与 value 比较会永不相等而反复 setContent，造成无限重渲染/白屏。
+  const lastEmitted = useRef<string>(value);
+
   const editor = useEditor({
     extensions: [
       StarterKit,
@@ -21,14 +25,20 @@ export default function RichEditor({ value, onChange }: Props) {
       TableKit.configure({ table: { resizable: true } })
     ],
     content: value,
-    onUpdate: ({ editor }) => onChange(editor.getHTML())
+    onUpdate: ({ editor }) => {
+      const html = editor.getHTML();
+      lastEmitted.current = html;
+      onChange(html);
+    }
   });
 
-  // 外部 value 变化（如加载完成、切换模式）时同步进编辑器，避免覆盖正在输入的内容
+  // 仅当外部传入的 value 与我方回写值不同（加载完成/切换模式/外部重置）时才载入，
+  // 避免把编辑器自身回写又灌回去导致循环。
   useEffect(() => {
-    if (editor && value !== editor.getHTML()) {
-      editor.commands.setContent(value, { emitUpdate: false });
-    }
+    if (!editor) return;
+    if (value === lastEmitted.current) return;
+    lastEmitted.current = value;
+    editor.commands.setContent(value, { emitUpdate: false });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [value, editor]);
 
