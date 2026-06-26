@@ -107,6 +107,7 @@
   }
 
   .topbar {
+    overflow: visible;
     padding-top: var(--mobile-statusbar-height);
     background: var(--bg-elevated);
     background: color-mix(in srgb, var(--bg-elevated) 88%, transparent);
@@ -114,7 +115,23 @@
     backdrop-filter: saturate(180%) blur(14px);
   }
 
+  .topbar::before {
+    content: '';
+    position: fixed;
+    left: 0;
+    right: 0;
+    top: 0;
+    z-index: 0;
+    height: max(var(--safe-top), 44px);
+    background: var(--bg-elevated);
+    background: color-mix(in srgb, var(--bg-elevated) 88%, transparent);
+    backdrop-filter: saturate(180%) blur(14px);
+    pointer-events: none;
+  }
+
   .topbar-inner {
+    position: relative;
+    z-index: 1;
     height: var(--mobile-topbar-height);
     border-bottom: 1px solid var(--border);
     padding-left: max(14px, var(--safe-left));
