@@ -273,7 +273,7 @@ button {
 @media (max-width: 640px) {
   html,
   body {
-    background: #000000;
+    background: var(--bg-elevated);
   }
 
   #root {
