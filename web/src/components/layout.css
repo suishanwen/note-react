@@ -113,6 +113,7 @@
     background: transparent;
     border-bottom: none;
     backdrop-filter: none;
+    padding-top: 0;
   }
 
   .topbar::before {
@@ -120,7 +121,7 @@
     position: absolute;
     left: 0;
     right: 0;
-    top: var(--safe-top);
+    top: 0;
     bottom: 0;
     z-index: -1;
     background: var(--bg-elevated);
@@ -148,7 +149,21 @@
   .content {
     max-width: none;
     background: var(--bg-elevated);
-    padding: calc(var(--safe-top) + var(--mobile-topbar-height) + 12px)
-      var(--safe-right) calc(16px + var(--safe-bottom)) var(--safe-left);
+    padding: calc(var(--mobile-topbar-height) + 12px) var(--safe-right)
+      calc(16px + var(--safe-bottom)) var(--safe-left);
+  }
+}
+
+@media (max-width: 640px) and (display-mode: standalone) {
+  .topbar {
+    padding-top: var(--safe-top);
+  }
+
+  .topbar::before {
+    top: var(--safe-top);
+  }
+
+  .content {
+    padding-top: calc(var(--safe-top) + var(--mobile-topbar-height) + 12px);
   }
 }
