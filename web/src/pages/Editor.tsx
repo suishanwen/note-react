@@ -4,7 +4,11 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import MDEditor, { commands } from '@uiw/react-md-editor';
 import { fetchNote, createNote, updateNote, uploadImage } from '../api/notes';
 import type { NoteInput } from '../types';
+import Markdown from '../components/Markdown';
 import './editor.css';
+
+// 编辑器预览复用正文渲染：```live 块在预览里即沙箱运行，所见即所得
+const previewRender = (source: string) => <Markdown content={source} />;
 
 const DRAFT_KEY = 'note_draft_new';
 
@@ -163,11 +167,15 @@ export default function Editor() {
           onChange={(v) => update({ content: v ?? '' })}
           height={460}
           preview="live"
+          components={{ preview: previewRender }}
           extraCommands={[commands.codeEdit, commands.codeLive, commands.codePreview]}
         />
       </div>
 
-      <p className="editor-hint">支持 Markdown，粘贴或拖拽图片自动上传</p>
+      <p className="editor-hint">
+        支持 Markdown，粘贴或拖拽图片自动上传；用 <code>```live</code> 代码块包裹
+        HTML/JS，预览与详情页将在沙箱中运行
+      </p>
 
       {errorMsg && <div className="editor-error">{errorMsg}</div>}
 
