@@ -272,15 +272,6 @@ button {
 
 /* 移动端：缩小容器边距与按钮，避免拥挤 */
 @media (max-width: 640px) {
-  html,
-  body {
-    background: var(--bg-elevated);
-  }
-
-  #root {
-    background: var(--bg-elevated);
-  }
-
   .container {
     padding: 0 14px;
   }
