@@ -17,6 +17,9 @@ export function useTheme() {
     document.documentElement.setAttribute('data-theme', theme);
     document.documentElement.setAttribute('data-color-mode', theme);
     localStorage.setItem(THEME_KEY, theme);
+    // 状态栏(时间/信号)颜色跟随主题背景，消除全面屏白/黑边
+    const meta = document.querySelector('meta[name="theme-color"]');
+    if (meta) meta.setAttribute('content', theme === 'dark' ? '#14151a' : '#f6f5f1');
   }, [theme]);
 
   const toggle = useCallback(() => {
