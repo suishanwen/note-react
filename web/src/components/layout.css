@@ -103,12 +103,22 @@
 }
 
 @media (max-width: 640px) {
-  /* 顶栏背景延伸进状态栏(safe-top)，纯色铺满，消除白/黑边 */
+  /* 顶栏改为透明悬浮层：内容从其下方透出、可滚到状态栏，按钮浮在上层 */
   .topbar {
-    background: var(--bg);
-    backdrop-filter: none;
-    -webkit-backdrop-filter: none;
-    border-bottom: 1px solid var(--border);
+    position: fixed;
+    left: 0;
+    right: 0;
+    top: 0;
+    background: transparent;
+    border-bottom: none;
+    /* 顶部柔和渐变，保证按钮在内容上可辨识，又不挡住内容 */
+    background: linear-gradient(
+      to bottom,
+      color-mix(in srgb, var(--bg) 80%, transparent),
+      transparent
+    );
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
     padding-top: var(--safe-top);
   }
   .topbar-inner {
@@ -126,9 +136,10 @@
     width: 34px;
     height: 34px;
   }
-  /* 内容贴边铺满，仅留刘海安全区 */
+  /* 顶栏脱离文档流：内容预留状态栏+顶栏高度，但仍可滚到其下方 */
   .content {
     max-width: none;
-    padding: 12px var(--safe-right) calc(16px + var(--safe-bottom)) var(--safe-left);
+    padding: calc(var(--safe-top) + var(--mobile-topbar-height) + 8px) var(--safe-right)
+      calc(16px + var(--safe-bottom)) var(--safe-left);
   }
 }
