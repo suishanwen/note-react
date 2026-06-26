@@ -107,31 +107,12 @@
   }
 
   .topbar {
-    position: fixed;
-    left: 0;
-    right: 0;
-    background: transparent;
-    border-bottom: none;
-    backdrop-filter: none;
     padding-top: 0;
-  }
-
-  .topbar::before {
-    content: '';
-    position: absolute;
-    left: 0;
-    right: 0;
-    top: 0;
-    bottom: 0;
-    z-index: -1;
     background: var(--bg-elevated);
     background: color-mix(in srgb, var(--bg-elevated) 88%, transparent);
-    border-bottom: 1px solid var(--border);
-    backdrop-filter: saturate(180%) blur(14px);
   }
 
   .topbar-inner {
-    position: relative;
     height: var(--mobile-topbar-height);
     padding-left: max(14px, var(--safe-left));
     padding-right: max(14px, var(--safe-right));
@@ -149,21 +130,12 @@
   .content {
     max-width: none;
     background: var(--bg-elevated);
-    padding: calc(var(--mobile-topbar-height) + 12px) var(--safe-right)
-      calc(16px + var(--safe-bottom)) var(--safe-left);
+    padding: 12px var(--safe-right) calc(16px + var(--safe-bottom)) var(--safe-left);
   }
 }
 
 @media (max-width: 640px) and (display-mode: standalone) {
   .topbar {
     padding-top: var(--safe-top);
-  }
-
-  .topbar::before {
-    top: var(--safe-top);
-  }
-
-  .content {
-    padding-top: calc(var(--safe-top) + var(--mobile-topbar-height) + 12px);
   }
 }
