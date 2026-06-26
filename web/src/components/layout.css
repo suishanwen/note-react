@@ -103,31 +103,36 @@
 }
 
 @media (max-width: 640px) {
-  /* 顶栏改为透明悬浮层：内容从其下方透出、可滚到状态栏，按钮浮在上层 */
+  /* 顶栏完全透明悬浮，无背景/无模糊：内容真正滚到状态栏下、填满顶部 */
   .topbar {
     position: fixed;
     left: 0;
     right: 0;
     top: 0;
-    background: transparent;
+    background: none;
     border-bottom: none;
-    /* 顶部柔和渐变，保证按钮在内容上可辨识，又不挡住内容 */
-    background: linear-gradient(
-      to bottom,
-      color-mix(in srgb, var(--bg) 80%, transparent),
-      transparent
-    );
-    backdrop-filter: blur(6px);
-    -webkit-backdrop-filter: blur(6px);
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
     padding-top: var(--safe-top);
+    pointer-events: none; /* 顶栏空白区不拦截，内容可滚动；按钮单独恢复 */
   }
   .topbar-inner {
     height: var(--mobile-topbar-height);
     padding-left: max(14px, var(--safe-left));
     padding-right: max(14px, var(--safe-right));
   }
-  .brand {
+  /* 按钮恢复可点击，并各自带背景以在内容上可辨识 */
+  .topbar .brand,
+  .topbar .topbar-actions {
+    pointer-events: auto;
+  }
+  .topbar .brand {
     font-size: 18px;
+    padding: 4px 8px 4px 4px;
+    border-radius: 999px;
+    background: color-mix(in srgb, var(--bg) 70%, transparent);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
   }
   .topbar-actions {
     gap: 6px;
@@ -136,10 +141,10 @@
     width: 34px;
     height: 34px;
   }
-  /* 顶栏脱离文档流：内容预留状态栏+顶栏高度，但仍可滚到其下方 */
+  /* 内容铺满：仅留极小顶距，初始内容不被悬浮按钮压住，滚动时透到状态栏 */
   .content {
     max-width: none;
-    padding: calc(var(--safe-top) + var(--mobile-topbar-height) + 8px) var(--safe-right)
+    padding: calc(var(--safe-top) + var(--mobile-topbar-height) + 4px) var(--safe-right)
       calc(16px + var(--safe-bottom)) var(--safe-left);
   }
 }
