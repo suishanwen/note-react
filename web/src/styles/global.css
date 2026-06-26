@@ -9,6 +9,7 @@
   --safe-right: env(safe-area-inset-right, 0px);
   --safe-bottom: env(safe-area-inset-bottom, 0px);
   --safe-left: env(safe-area-inset-left, 0px);
+  --mobile-topbar-height: 52px;
   /* 两档宽度：阅读正文舒适阈值 / 宽屏内容（列表、编辑、live 应用） */
   --w-read: 860px;
   --w-wide: min(1200px, 100%);
@@ -269,6 +270,12 @@ button {
 
 /* 移动端：缩小容器边距与按钮，避免拥挤 */
 @media (max-width: 640px) {
+  html,
+  body,
+  #root {
+    background: var(--bg-elevated);
+  }
+
   .container {
     padding: 0 14px;
   }

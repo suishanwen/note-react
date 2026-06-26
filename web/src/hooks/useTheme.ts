@@ -17,9 +17,9 @@ export function useTheme() {
     document.documentElement.setAttribute('data-theme', theme);
     document.documentElement.setAttribute('data-color-mode', theme);
     localStorage.setItem(THEME_KEY, theme);
-    // 状态栏(时间/信号)颜色跟随主题背景，消除全面屏白/黑边
+    // 状态栏颜色跟随移动端内容面，避免 iOS 顶部露出页面底色
     const meta = document.querySelector('meta[name="theme-color"]');
-    if (meta) meta.setAttribute('content', theme === 'dark' ? '#14151a' : '#f6f5f1');
+    if (meta) meta.setAttribute('content', theme === 'dark' ? '#1c1e25' : '#ffffff');
   }, [theme]);
 
   const toggle = useCallback(() => {

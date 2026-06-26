@@ -16,7 +16,6 @@
   background: color-mix(in srgb, var(--bg) 82%, transparent);
   backdrop-filter: saturate(180%) blur(14px);
   border-bottom: 1px solid var(--border);
-  /* 全面屏：背景延伸到状态栏区域，避免刘海下露白/黑边 */
   padding-top: var(--safe-top);
 }
 
@@ -103,9 +102,36 @@
 }
 
 @media (max-width: 640px) {
-  /* 全面屏：顶栏贴边并适配刘海安全区 */
+  .layout {
+    background: var(--bg-elevated);
+  }
+
+  .topbar {
+    position: fixed;
+    left: 0;
+    right: 0;
+    background: transparent;
+    border-bottom: none;
+    backdrop-filter: none;
+  }
+
+  .topbar::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: var(--safe-top);
+    bottom: 0;
+    z-index: -1;
+    background: var(--bg-elevated);
+    background: color-mix(in srgb, var(--bg-elevated) 88%, transparent);
+    border-bottom: 1px solid var(--border);
+    backdrop-filter: saturate(180%) blur(14px);
+  }
+
   .topbar-inner {
-    height: 52px;
+    position: relative;
+    height: var(--mobile-topbar-height);
     padding-left: max(14px, var(--safe-left));
     padding-right: max(14px, var(--safe-right));
   }
@@ -119,9 +145,10 @@
     width: 34px;
     height: 34px;
   }
-  /* 内容区贴边铺满：左右零边距，仅保留刘海安全区（竖屏为 0） */
   .content {
     max-width: none;
-    padding: 12px var(--safe-right) calc(16px + var(--safe-bottom)) var(--safe-left);
+    background: var(--bg-elevated);
+    padding: calc(var(--safe-top) + var(--mobile-topbar-height) + 12px)
+      var(--safe-right) calc(16px + var(--safe-bottom)) var(--safe-left);
   }
 }

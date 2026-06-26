@@ -27,6 +27,7 @@
 @media (max-width: 640px) {
   .footer {
     margin-top: 32px;
+    background: var(--bg-elevated);
     padding-top: 22px;
     padding-bottom: calc(28px + var(--safe-bottom));
   }
