@@ -15,6 +15,7 @@
   background: var(--bg);
   background: color-mix(in srgb, var(--bg) 82%, transparent);
   backdrop-filter: saturate(180%) blur(14px);
+  -webkit-backdrop-filter: saturate(180%) blur(14px);
   border-bottom: 1px solid var(--border);
   padding-top: var(--safe-top);
 }
@@ -109,23 +110,23 @@
   .topbar {
     overflow: visible;
     padding-top: var(--mobile-statusbar-height);
-    background: var(--bg-elevated);
-    background: color-mix(in srgb, var(--bg-elevated) 88%, transparent);
+    background: transparent;
     border-bottom: none;
-    backdrop-filter: saturate(180%) blur(14px);
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
   }
 
   .topbar::before {
     content: '';
-    position: fixed;
+    position: absolute;
     left: 0;
     right: 0;
     top: 0;
     z-index: 0;
-    height: max(var(--safe-top), 44px);
-    background: var(--bg-elevated);
-    background: color-mix(in srgb, var(--bg-elevated) 88%, transparent);
-    backdrop-filter: saturate(180%) blur(14px);
+    bottom: 0;
+    background: color-mix(in srgb, var(--bg-elevated) 58%, transparent);
+    backdrop-filter: saturate(180%) blur(16px);
+    -webkit-backdrop-filter: saturate(180%) blur(16px);
     pointer-events: none;
   }
 

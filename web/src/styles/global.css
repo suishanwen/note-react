@@ -10,7 +10,7 @@
   --safe-bottom: env(safe-area-inset-bottom, 0px);
   --safe-left: env(safe-area-inset-left, 0px);
   --mobile-topbar-height: 52px;
-  --mobile-statusbar-height: 0px;
+  --mobile-statusbar-height: var(--safe-top);
   /* 两档宽度：阅读正文舒适阈值 / 宽屏内容（列表、编辑、live 应用） */
   --w-read: 860px;
   --w-wide: min(1200px, 100%);
@@ -64,7 +64,7 @@ html,
 body {
   margin: 0;
   padding: 0;
-  /* 根画布也填主题背景：消除状态栏/回弹区的白边，实现全面屏 */
+  /* 根画布填满主题色，避免全面屏边缘露出白边 */
   background: var(--bg);
   min-height: 100%;
 }
@@ -87,6 +87,7 @@ body {
   line-height: 1.65;
   overflow-x: hidden;
   -webkit-font-smoothing: antialiased;
+  -webkit-overflow-scrolling: touch;
   text-rendering: optimizeLegibility;
   transition: background var(--transition), color var(--transition);
 }
