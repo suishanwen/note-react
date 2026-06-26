@@ -31,6 +31,34 @@
   overflow: hidden;
 }
 
+/* 内容类型切换 */
+.editor-mode {
+  display: flex;
+  gap: 4px;
+  margin-bottom: 12px;
+  padding: 3px;
+  background: var(--bg-subtle);
+  border-radius: var(--radius-sm);
+  width: fit-content;
+}
+
+.editor-mode button {
+  padding: 6px 14px;
+  border: none;
+  background: none;
+  color: var(--text-muted);
+  font-size: 13.5px;
+  font-weight: 500;
+  border-radius: 6px;
+  transition: background var(--transition), color var(--transition);
+}
+
+.editor-mode button.active {
+  background: var(--bg-elevated);
+  color: var(--accent);
+  box-shadow: var(--shadow-sm);
+}
+
 .editor-hint {
   font-size: 12.5px;
   color: var(--text-faint);

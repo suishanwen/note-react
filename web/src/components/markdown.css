@@ -122,3 +122,10 @@
   background: transparent;
   color: var(--text);
 }
+
+/* live 块由 code 组件渲染但仍被 pre 包裹，去掉 pre 的代码框样式避免双重边框 */
+.markdown-body pre:has(.live-block) {
+  background: none;
+  border: none;
+  padding: 0;
+}

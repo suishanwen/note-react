@@ -5,10 +5,14 @@ import MDEditor, { commands } from '@uiw/react-md-editor';
 import { fetchNote, createNote, updateNote, uploadImage } from '../api/notes';
 import type { NoteInput } from '../types';
 import Markdown from '../components/Markdown';
+import LiveEditor from '../components/LiveEditor';
+import { isLiveOnly, extractLive, wrapLive } from '../utils/liveBlock';
 import './editor.css';
 
 // 编辑器预览复用正文渲染：```live 块在预览里即沙箱运行，所见即所得
 const previewRender = (source: string) => <Markdown content={source} />;
+
+type EditMode = 'markdown' | 'live';
 
 const DRAFT_KEY = 'note_draft_new';
 
@@ -28,6 +32,7 @@ export default function Editor() {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const [form, setForm] = useState<NoteInput>(empty);
+  const [mode, setMode] = useState<EditMode>('markdown');
   const [errorMsg, setErrorMsg] = useState('');
 
   // 编辑模式：拉取原数据填充
@@ -39,15 +44,18 @@ export default function Editor() {
 
   useEffect(() => {
     if (existing) {
+      const content = existing.content ?? '';
       setForm({
         parent: existing.parent ?? -1,
         title: existing.title ?? '',
-        content: existing.content ?? '',
+        content,
         summary: existing.summary ?? '',
         tag: existing.tag ?? '',
         poster: existing.poster ?? '',
         recommend: existing.recommend ?? 0
       });
+      // content 为单个 live 块 → 自动进入应用模式
+      setMode(isLiveOnly(content) ? 'live' : 'markdown');
     }
   }, [existing]);
 
@@ -73,6 +81,23 @@ export default function Editor() {
   }, [form, isEdit]);
 
   const update = (patch: Partial<NoteInput>) => setForm((f) => ({ ...f, ...patch }));
+
+  // 切换内容类型：往返转换 content，确保数据不丢（统一存在 content 字段）
+  const switchMode = (next: EditMode) => {
+    if (next === mode) return;
+    setForm((f) => {
+      if (next === 'live') {
+        // 文档→应用：非 live 则把现有正文作为初始源码包进 live 块
+        return { ...f, content: isLiveOnly(f.content) ? f.content : wrapLive(f.content) };
+      }
+      // 应用→文档：还原为 ```live 文本，可继续按 Markdown 编辑
+      return f;
+    });
+    setMode(next);
+  };
+
+  // 应用模式下 LiveEditor 编辑的是 live 块内部源码，存回时重新包裹
+  const onLiveChange = (src: string) => update({ content: wrapLive(src) });
 
   const saveMutation = useMutation({
     mutationFn: (input: NoteInput) =>
@@ -161,20 +186,42 @@ export default function Editor() {
         </div>
       </div>
 
-      <div className="editor-md" onPaste={handleImage} onDrop={handleImage}>
-        <MDEditor
-          value={form.content}
-          onChange={(v) => update({ content: v ?? '' })}
-          height={460}
-          preview="live"
-          components={{ preview: previewRender }}
-          extraCommands={[commands.codeEdit, commands.codeLive, commands.codePreview]}
-        />
+      <div className="editor-mode">
+        <button
+          type="button"
+          className={mode === 'markdown' ? 'active' : ''}
+          onClick={() => switchMode('markdown')}
+        >
+          Markdown 文档
+        </button>
+        <button
+          type="button"
+          className={mode === 'live' ? 'active' : ''}
+          onClick={() => switchMode('live')}
+        >
+          可运行应用
+        </button>
       </div>
 
+      {mode === 'live' ? (
+        <LiveEditor value={extractLive(form.content)} onChange={onLiveChange} />
+      ) : (
+        <div className="editor-md" onPaste={handleImage} onDrop={handleImage}>
+          <MDEditor
+            value={form.content}
+            onChange={(v) => update({ content: v ?? '' })}
+            height={460}
+            preview="live"
+            components={{ preview: previewRender }}
+            extraCommands={[commands.codeEdit, commands.codeLive, commands.codePreview]}
+          />
+        </div>
+      )}
+
       <p className="editor-hint">
-        支持 Markdown，粘贴或拖拽图片自动上传；用 <code>```live</code> 代码块包裹
-        HTML/JS，预览与详情页将在沙箱中运行
+        {mode === 'live'
+          ? '左侧编辑 HTML/JS，右侧沙箱实时预览；脚本与主站隔离，无法访问登录凭证'
+          : '支持 Markdown，粘贴或拖拽图片自动上传；切到「可运行应用」可写带 JS 的交互内容'}
       </p>
 
       {errorMsg && <div className="editor-error">{errorMsg}</div>}

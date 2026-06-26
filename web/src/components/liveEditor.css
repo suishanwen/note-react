@@ -1,0 +1,50 @@
+.live-editor {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+}
+
+.live-editor-pane {
+  min-width: 0;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+  background: var(--bg-elevated);
+}
+
+.live-editor-label {
+  padding: 7px 12px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-faint);
+  background: var(--bg-subtle);
+  border-bottom: 1px solid var(--border);
+}
+
+/* CodeMirror 自适应高度，等宽字体 */
+.live-editor-pane .cm-editor {
+  font-size: 13px;
+  font-family: var(--font-mono);
+}
+
+.live-editor-preview {
+  height: 460px;
+  overflow: auto;
+  padding: 10px;
+}
+
+/* 预览区里的 live 块去掉自带边框，避免双重框 */
+.live-editor-preview .live-block {
+  margin: 0;
+  border: none;
+}
+
+@media (max-width: 800px) {
+  .live-editor {
+    grid-template-columns: 1fr;
+  }
+  .live-editor-preview {
+    height: auto;
+    max-height: 460px;
+  }
+}

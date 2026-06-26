@@ -1,6 +1,6 @@
-/* 列表是文档树，比阅读页更宽 */
+/* 列表是文档树，随宽屏加宽 */
 .list-page {
-  max-width: 920px;
+  max-width: var(--w-wide);
   margin: 0 auto;
 }
 

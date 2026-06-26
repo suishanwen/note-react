@@ -1,11 +1,19 @@
 .detail-page {
-  max-width: 740px;
+  max-width: var(--w-wide);
   margin: 0 auto;
   background: var(--bg-elevated);
   border: 1px solid var(--border);
   border-radius: var(--radius);
   box-shadow: var(--shadow);
   padding: 40px 44px;
+}
+
+/* 阅读舒适：正文文字块限宽居中；live 应用与表格撑满整页框 */
+.detail-page .detail-header,
+.detail-page .markdown-body > *:not(table):not(pre) {
+  max-width: var(--w-read);
+  margin-left: auto;
+  margin-right: auto;
 }
 
 .detail-header {
