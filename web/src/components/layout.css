@@ -107,13 +107,18 @@
   }
 
   .topbar {
-    padding-top: 0;
-    background: var(--bg-elevated);
-    background: color-mix(in srgb, var(--bg-elevated) 88%, transparent);
+    padding-top: var(--mobile-statusbar-height);
+    background: #000000;
+    border-bottom: none;
+    backdrop-filter: none;
   }
 
   .topbar-inner {
     height: var(--mobile-topbar-height);
+    background: var(--bg-elevated);
+    background: color-mix(in srgb, var(--bg-elevated) 88%, transparent);
+    border-bottom: 1px solid var(--border);
+    backdrop-filter: saturate(180%) blur(14px);
     padding-left: max(14px, var(--safe-left));
     padding-right: max(14px, var(--safe-right));
   }
@@ -131,11 +136,5 @@
     max-width: none;
     background: var(--bg-elevated);
     padding: 12px var(--safe-right) calc(16px + var(--safe-bottom)) var(--safe-left);
-  }
-}
-
-@media (max-width: 640px) and (display-mode: standalone) {
-  .topbar {
-    padding-top: var(--safe-top);
   }
 }
