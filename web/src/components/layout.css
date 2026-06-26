@@ -103,38 +103,16 @@
 }
 
 @media (max-width: 640px) {
-  .layout {
-    background: var(--bg-elevated);
-  }
-
+  /* 顶栏背景延伸进状态栏(safe-top)，纯色铺满，消除白/黑边 */
   .topbar {
-    overflow: visible;
-    padding-top: var(--mobile-statusbar-height);
-    background: transparent;
-    border-bottom: none;
+    background: var(--bg);
     backdrop-filter: none;
     -webkit-backdrop-filter: none;
-  }
-
-  .topbar::before {
-    content: '';
-    position: absolute;
-    left: 0;
-    right: 0;
-    top: 0;
-    z-index: 0;
-    bottom: 0;
-    background: color-mix(in srgb, var(--bg-elevated) 58%, transparent);
-    backdrop-filter: saturate(180%) blur(16px);
-    -webkit-backdrop-filter: saturate(180%) blur(16px);
-    pointer-events: none;
-  }
-
-  .topbar-inner {
-    position: relative;
-    z-index: 1;
-    height: var(--mobile-topbar-height);
     border-bottom: 1px solid var(--border);
+    padding-top: var(--safe-top);
+  }
+  .topbar-inner {
+    height: var(--mobile-topbar-height);
     padding-left: max(14px, var(--safe-left));
     padding-right: max(14px, var(--safe-right));
   }
@@ -148,9 +126,9 @@
     width: 34px;
     height: 34px;
   }
+  /* 内容贴边铺满，仅留刘海安全区 */
   .content {
     max-width: none;
-    background: var(--bg-elevated);
     padding: 12px var(--safe-right) calc(16px + var(--safe-bottom)) var(--safe-left);
   }
 }

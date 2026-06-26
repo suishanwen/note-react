@@ -17,9 +17,9 @@ export function useTheme() {
     document.documentElement.setAttribute('data-theme', theme);
     document.documentElement.setAttribute('data-color-mode', theme);
     localStorage.setItem(THEME_KEY, theme);
-    // 透明状态栏让滚动内容可以延伸到屏幕顶部
+    // 状态栏颜色跟随主题背景，消除白/黑边（transparent 无效会被 iOS 当白色）
     const meta = document.querySelector('meta[name="theme-color"]');
-    if (meta) meta.setAttribute('content', 'transparent');
+    if (meta) meta.setAttribute('content', theme === 'dark' ? '#14151a' : '#f6f5f1');
   }, [theme]);
 
   const toggle = useCallback(() => {
