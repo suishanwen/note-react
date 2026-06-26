@@ -4,13 +4,24 @@
     <meta charset="UTF-8" />
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
-    <meta name="theme-color" content="#f6f5f1" media="(prefers-color-scheme: light)" />
-    <meta name="theme-color" content="#14151a" media="(prefers-color-scheme: dark)" />
+    <!-- theme-color 跟随“应用”主题（非系统配色），首帧前设好，状态栏与页面同色 -->
+    <meta name="theme-color" content="#f6f5f1" />
     <meta name="mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-capable" content="yes" />
-    <!-- 添加到主屏幕后全屏运行，内容延伸到状态栏（Safari 标签内无此效果，系统限制） -->
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
     <title>Note</title>
+    <script>
+      (function () {
+        try {
+          var t = localStorage.getItem('note_theme');
+          if (t !== 'light' && t !== 'dark') {
+            t = matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+          }
+          document.documentElement.setAttribute('data-theme', t);
+          var m = document.querySelector('meta[name="theme-color"]');
+          if (m) m.setAttribute('content', t === 'dark' ? '#14151a' : '#f6f5f1');
+        } catch (e) {}
+      })();
+    </script>
   </head>
   <body>
     <div id="root"></div>
