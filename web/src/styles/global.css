@@ -288,17 +288,3 @@ button {
     font-size: 13px;
   }
 }
-
-@media (max-width: 640px) {
-  :root {
-    --mobile-statusbar-height: var(--safe-top);
-  }
-}
-
-@supports (-webkit-touch-callout: none) {
-  @media (max-width: 640px) {
-    :root {
-      --mobile-statusbar-height: max(var(--safe-top), 44px);
-    }
-  }
-}
