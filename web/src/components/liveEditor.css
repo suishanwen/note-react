@@ -48,3 +48,36 @@
     max-height: 460px;
   }
 }
+
+/* 表格应用编辑器：表格可视化 + 折叠的样式/脚本 */
+.lt-toolbar {
+  position: static;
+  border-radius: 0;
+}
+
+.lt-table {
+  min-height: 240px;
+}
+
+.lt-code-toggle {
+  margin-top: 10px;
+  padding: 7px 12px;
+  border: 1px dashed var(--border-strong);
+  border-radius: var(--radius-sm);
+  background: var(--bg-subtle);
+  color: var(--text-muted);
+  font-size: 13px;
+}
+
+.lt-code {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: 10px;
+}
+
+.lt-code-block {
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+}

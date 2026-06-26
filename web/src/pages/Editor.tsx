@@ -7,7 +7,8 @@ import type { NoteInput } from '../types';
 import Markdown from '../components/Markdown';
 import RichEditor from '../components/RichEditor';
 import LiveEditor from '../components/LiveEditor';
-import { isLiveOnly, extractLive, wrapLive } from '../utils/liveBlock';
+import LiveTableEditor from '../components/LiveTableEditor';
+import { isLiveOnly, extractLive, wrapLive, hasTable } from '../utils/liveBlock';
 import { toEditableHtml } from '../utils/content';
 import './editor.css';
 
@@ -223,13 +224,20 @@ export default function Editor() {
         </div>
       )}
 
-      {mode === 'live' && <LiveEditor value={extractLive(form.content)} onChange={onLiveChange} />}
+      {mode === 'live' &&
+        (hasTable(extractLive(form.content)) ? (
+          <LiveTableEditor value={extractLive(form.content)} onChange={onLiveChange} />
+        ) : (
+          <LiveEditor value={extractLive(form.content)} onChange={onLiveChange} />
+        ))}
 
       <p className="editor-hint">
         {mode === 'rich' &&
           '所见即所得：工具栏可视化编辑表格（增删行列）、标题、列表、图片、链接'}
         {mode === 'source' && '源码模式：直接写 Markdown / HTML，粘贴或拖拽图片自动上传'}
-        {mode === 'live' &&
+        {mode === 'live' && hasTable(extractLive(form.content)) &&
+          '表格可视化编辑（自动求和等脚本保留运行），样式与脚本可在下方展开微调'}
+        {mode === 'live' && !hasTable(extractLive(form.content)) &&
           '左侧编辑 HTML/JS，右侧沙箱实时预览；脚本与主站隔离，无法访问登录凭证'}
       </p>
 
