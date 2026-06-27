@@ -1,6 +1,7 @@
 import { Router } from 'express';
 import pool from '../db.js';
 import { auth, canViewEncrypted } from '../middleware/auth.js';
+import { asyncHandler, HttpError } from '../middleware/error.js';
 
 const router = Router();
 
@@ -11,6 +12,7 @@ const DETAIL_FIELDS =
   'id, parent, title, content, tag, summary, poster, ip, recommend, post_time AS postTime, edit_time AS editTime';
 
 const ENCRYPTED = -1;
+const TOP_LEVEL = -1;
 
 // 取真实客户端 IP
 function clientIp(req) {
@@ -27,7 +29,8 @@ function normalizeRecommend(value) {
 }
 
 // 基于全量行（含 id/parent/recommend）构建"有效加密"判定：
-// 笔记自身或任一祖先加密，则视为加密 —— 父级加锁，整棵子树都锁
+// 笔记自身或任一祖先加密，则视为加密 —— 父级加锁，整棵子树都锁。
+// 列表接口本就需要全量行做遮罩，故在此一次性构建判定函数。
 function makeEncryptionResolver(rows) {
   const map = new Map();
   for (const r of rows) map.set(r.id, r);
@@ -40,7 +43,7 @@ function makeEncryptionResolver(rows) {
     let result;
     if (node.recommend === ENCRYPTED) {
       result = true;
-    } else if (node.parent != null && node.parent !== -1) {
+    } else if (node.parent != null && node.parent !== TOP_LEVEL) {
       result = resolve(node.parent, seen);
     } else {
       result = false;
@@ -51,16 +54,28 @@ function makeEncryptionResolver(rows) {
   return (id) => resolve(id, new Set());
 }
 
-// 查询某笔记是否处于加密路径下（自身或祖先加密）
+// 查询单条笔记是否处于加密路径下：只沿 parent 链逐级上溯，避免全表扫描。
+// 含环保护；任一节点（自身或祖先）加密即返回 true。
 async function isPathEncrypted(id) {
-  const [rows] = await pool.query('SELECT id, parent, recommend FROM note');
-  return makeEncryptionResolver(rows)(id);
+  const seen = new Set();
+  let currentId = id;
+  while (currentId != null && currentId !== TOP_LEVEL && !seen.has(currentId)) {
+    seen.add(currentId);
+    const [rows] = await pool.query('SELECT parent, recommend FROM note WHERE id = ?', [currentId]);
+    if (!rows.length) return false;
+    const node = rows[0];
+    if (node.recommend === ENCRYPTED) return true;
+    currentId = node.parent;
+  }
+  return false;
 }
 
-// GET /api/notes — 列表。加密判定沿 parent 链：父级加锁则整棵子树都锁
+// GET /api/notes — 列表。加密判定沿 parent 链：父级加锁则整棵子树都锁。
 // 不在 SQL 层按关键字/摘要过滤，避免加密内容经搜索泄露；过滤由前端在可见数据上做
-router.get('/', canViewEncrypted, async (req, res) => {
-  try {
+router.get(
+  '/',
+  canViewEncrypted,
+  asyncHandler(async (req, res) => {
     const [rows] = await pool.query(
       `SELECT ${LIST_FIELDS} FROM note ORDER BY COALESCE(edit_time, post_time) DESC`
     );
@@ -84,40 +99,37 @@ router.get('/', canViewEncrypted, async (req, res) => {
       return { ...row, locked: false };
     });
     res.json(result);
-  } catch (err) {
-    console.error('NotesRoute#list 查询失败 %s', err.message);
-    res.status(500).json({ message: '查询失败' });
-  }
-});
+  })
+);
 
 // GET /api/notes/:id — 详情。自身或任一祖先加密，未授权一律 403
-router.get('/:id', canViewEncrypted, async (req, res) => {
-  try {
+router.get(
+  '/:id',
+  canViewEncrypted,
+  asyncHandler(async (req, res) => {
     if (!req.canViewEncrypted && (await isPathEncrypted(Number(req.params.id)))) {
-      return res.status(403).json({ message: '该笔记已加密，请登录后查看', locked: true });
+      throw new HttpError(403, '该笔记已加密，请登录后查看');
     }
-    const [rows] = await pool.query(
-      `SELECT ${DETAIL_FIELDS} FROM note WHERE id = ?`,
-      [req.params.id]
-    );
-    if (!rows.length) return res.status(404).json({ message: '笔记不存在' });
+    const [rows] = await pool.query(`SELECT ${DETAIL_FIELDS} FROM note WHERE id = ?`, [
+      req.params.id
+    ]);
+    if (!rows.length) throw new HttpError(404, '笔记不存在');
     res.json(rows[0]);
-  } catch (err) {
-    console.error('NotesRoute#detail 查询失败 %s', err.message);
-    res.status(500).json({ message: '查询失败' });
-  }
-});
+  })
+);
 
 // POST /api/notes — 新增，服务端写入 ip 与时间
-router.post('/', auth, async (req, res) => {
-  const { parent, title, content, poster, tag, summary, recommend } = req.body || {};
-  if (!title) return res.status(400).json({ message: '标题不能为空' });
-  const now = new Date();
-  try {
+router.post(
+  '/',
+  auth,
+  asyncHandler(async (req, res) => {
+    const { parent, title, content, poster, tag, summary, recommend } = req.body || {};
+    if (!title) throw new HttpError(400, '标题不能为空');
+    const now = new Date();
     const [result] = await pool.query(
       'INSERT INTO note (parent, title, content, poster, ip, tag, summary, recommend, post_time, edit_time) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
       [
-        parent ?? -1,
+        parent ?? TOP_LEVEL,
         title,
         content ?? '',
         poster ?? null,
@@ -130,21 +142,20 @@ router.post('/', auth, async (req, res) => {
       ]
     );
     res.status(201).json({ id: result.insertId });
-  } catch (err) {
-    console.error('NotesRoute#create 新增失败 %s', err.message);
-    res.status(500).json({ message: '新增失败' });
-  }
-});
+  })
+);
 
 // PUT /api/notes/:id — 更新，写入 edit_time
-router.put('/:id', auth, async (req, res) => {
-  const { parent, title, content, poster, tag, summary, recommend } = req.body || {};
-  if (!title) return res.status(400).json({ message: '标题不能为空' });
-  try {
+router.put(
+  '/:id',
+  auth,
+  asyncHandler(async (req, res) => {
+    const { parent, title, content, poster, tag, summary, recommend } = req.body || {};
+    if (!title) throw new HttpError(400, '标题不能为空');
     const [result] = await pool.query(
       'UPDATE note SET parent=?, title=?, content=?, poster=?, tag=?, summary=?, recommend=?, edit_time=? WHERE id=?',
       [
-        parent ?? -1,
+        parent ?? TOP_LEVEL,
         title,
         content ?? '',
         poster ?? null,
@@ -155,42 +166,36 @@ router.put('/:id', auth, async (req, res) => {
         req.params.id
       ]
     );
-    if (!result.affectedRows) return res.status(404).json({ message: '笔记不存在' });
+    if (!result.affectedRows) throw new HttpError(404, '笔记不存在');
     res.json({ id: Number(req.params.id) });
-  } catch (err) {
-    console.error('NotesRoute#update 更新失败 %s', err.message);
-    res.status(500).json({ message: '更新失败' });
-  }
-});
+  })
+);
 
 // PATCH /api/notes/:id/parent — 仅调整父级（拖拽改层级用），不改 edit_time 避免排序跳动
-router.patch('/:id/parent', auth, async (req, res) => {
-  const id = Number(req.params.id);
-  const parent = req.body?.parent ?? -1;
-  // 防止把节点挂到自己下面
-  if (Number(parent) === id) {
-    return res.status(400).json({ message: '不能将笔记设为自身的子级' });
-  }
-  try {
+router.patch(
+  '/:id/parent',
+  auth,
+  asyncHandler(async (req, res) => {
+    const id = Number(req.params.id);
+    const parent = req.body?.parent ?? TOP_LEVEL;
+    if (Number(parent) === id) {
+      throw new HttpError(400, '不能将笔记设为自身的子级');
+    }
     const [result] = await pool.query('UPDATE note SET parent=? WHERE id=?', [parent, id]);
-    if (!result.affectedRows) return res.status(404).json({ message: '笔记不存在' });
+    if (!result.affectedRows) throw new HttpError(404, '笔记不存在');
     res.json({ id });
-  } catch (err) {
-    console.error('NotesRoute#setParent 调整层级失败 %s', err.message);
-    res.status(500).json({ message: '调整层级失败' });
-  }
-});
+  })
+);
 
 // DELETE /api/notes/:id — 删除
-router.delete('/:id', auth, async (req, res) => {
-  try {
+router.delete(
+  '/:id',
+  auth,
+  asyncHandler(async (req, res) => {
     const [result] = await pool.query('DELETE FROM note WHERE id=?', [req.params.id]);
-    if (!result.affectedRows) return res.status(404).json({ message: '笔记不存在' });
+    if (!result.affectedRows) throw new HttpError(404, '笔记不存在');
     res.json({ id: Number(req.params.id) });
-  } catch (err) {
-    console.error('NotesRoute#remove 删除失败 %s', err.message);
-    res.status(500).json({ message: '删除失败' });
-  }
-});
+  })
+);
 
 export default router;

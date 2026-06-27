@@ -6,6 +6,7 @@ import { ApiError } from '../api/client';
 import { useAuth } from '../auth';
 import Markdown from '../components/Markdown';
 import { formatDateTime } from '../utils/date';
+import { useDocumentTitle } from '../hooks/useDocumentTitle';
 import { ENCRYPTED, RECOMMEND } from '../types';
 import './detail.css';
 
@@ -22,6 +23,8 @@ export default function Detail() {
     enabled: !!id,
     retry: false
   });
+
+  useDocumentTitle(note?.title);
 
   const removeMutation = useMutation({
     mutationFn: () => deleteNote(Number(id)),

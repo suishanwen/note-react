@@ -3,6 +3,7 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import { useMutation } from '@tanstack/react-query';
 import { login } from '../api/notes';
 import { useAuth } from '../auth';
+import { useDocumentTitle } from '../hooks/useDocumentTitle';
 import './login.css';
 
 interface LocationState {
@@ -15,6 +16,7 @@ export default function Login() {
   const navigate = useNavigate();
   const location = useLocation();
   const from = (location.state as LocationState)?.from || '/';
+  useDocumentTitle('登录');
 
   const loginMutation = useMutation({
     mutationFn: () => login(password),

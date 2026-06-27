@@ -1,8 +1,10 @@
 import express from 'express';
+import helmet from 'helmet';
 import fs from 'node:fs';
 import path from 'node:path';
 import config from './config.js';
 import { initDatabase } from './init.js';
+import { errorHandler } from './middleware/error.js';
 import authRouter from './routes/auth.js';
 import notesRouter from './routes/notes.js';
 import uploadRouter from './routes/upload.js';
@@ -10,6 +12,16 @@ import adminRouter from './routes/admin.js';
 
 const app = express();
 app.set('trust proxy', true);
+
+// 安全响应头。关闭 CSP 与跨源资源策略：正文渲染用户内嵌 HTML、data: 图片、
+// 以及沙箱 iframe 运行 live 应用，严格 CSP 会破坏这些功能
+app.use(
+  helmet({
+    contentSecurityPolicy: false,
+    crossOriginEmbedderPolicy: false,
+    crossOriginResourcePolicy: false
+  })
+);
 app.use(express.json({ limit: '10mb' }));
 
 // API 路由
@@ -29,6 +41,9 @@ if (fs.existsSync(config.staticDir)) {
     res.sendFile(path.join(config.staticDir, 'index.html'));
   });
 }
+
+// 全局错误处理（须在所有路由之后注册）
+app.use(errorHandler);
 
 // 先初始化数据库（建库建表 + 首次自动迁移），再启动服务
 initDatabase()

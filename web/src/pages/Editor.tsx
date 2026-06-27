@@ -6,6 +6,7 @@ import type { NoteInput } from '../types';
 import MarkdownEditor from '../components/MarkdownEditor';
 import LiveEditor from '../components/LiveEditor';
 import { isLiveOnly, extractLive, wrapLive } from '../utils/liveBlock';
+import { useDocumentTitle } from '../hooks/useDocumentTitle';
 import './editor.css';
 
 // 文档(Markdown) / 应用(可运行 live)。统一以 Markdown 为存储格式
@@ -31,6 +32,8 @@ export default function Editor() {
   const [form, setForm] = useState<NoteInput>(empty);
   const [mode, setMode] = useState<EditMode>('markdown');
   const [errorMsg, setErrorMsg] = useState('');
+
+  useDocumentTitle(isEdit ? `编辑 · ${form.title || '笔记'}` : '新建笔记');
 
   // 编辑模式：拉取原数据填充
   const { data: existing } = useQuery({
