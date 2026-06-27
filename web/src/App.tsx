@@ -2,6 +2,7 @@ import { Routes, Route, Navigate } from 'react-router-dom';
 import { Suspense, lazy } from 'react';
 import Layout from './components/Layout';
 import ProtectedRoute from './components/ProtectedRoute';
+import ErrorBoundary from './components/ErrorBoundary';
 import List from './pages/List';
 import Login from './pages/Login';
 
@@ -20,8 +21,9 @@ function Fallback() {
 export default function App() {
   return (
     <Layout>
-      <Suspense fallback={<Fallback />}>
-        <Routes>
+      <ErrorBoundary>
+        <Suspense fallback={<Fallback />}>
+          <Routes>
           <Route path="/" element={<List />} />
           <Route path="/note/:id" element={<Detail />} />
           <Route
@@ -42,8 +44,9 @@ export default function App() {
           />
           <Route path="/login" element={<Login />} />
           <Route path="*" element={<Navigate to="/" replace />} />
-        </Routes>
-      </Suspense>
+          </Routes>
+        </Suspense>
+      </ErrorBoundary>
     </Layout>
   );
 }

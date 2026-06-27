@@ -6,7 +6,6 @@ import { ApiError } from '../api/client';
 import { useAuth } from '../auth';
 import Markdown from '../components/Markdown';
 import { formatDateTime } from '../utils/date';
-import { toEditableHtml } from '../utils/content';
 import { ENCRYPTED, RECOMMEND } from '../types';
 import './detail.css';
 
@@ -96,7 +95,7 @@ export default function Detail() {
         )}
       </header>
 
-      <Markdown content={toEditableHtml(note.content)} />
+      <Markdown content={note.content} />
 
       <div className="detail-actions">
         <Link to="/" className="btn">
