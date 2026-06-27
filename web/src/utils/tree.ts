@@ -31,6 +31,19 @@ export function buildTree(notes: NoteSummary[]): NoteNode[] {
   return roots;
 }
 
+// 按深度优先顺序把树压平为列表，保留 depth（用于下拉缩进展示父级选择）
+export function flattenTree(nodes: NoteNode[]): NoteNode[] {
+  const result: NoteNode[] = [];
+  const walk = (list: NoteNode[]) => {
+    for (const n of list) {
+      result.push(n);
+      walk(n.children);
+    }
+  };
+  walk(nodes);
+  return result;
+}
+
 // 判断 maybeDescendantId 是否在 node 的子孙中（拖拽防环用）
 export function isDescendant(node: NoteNode, maybeDescendantId: number): boolean {
   for (const child of node.children) {

@@ -1,11 +1,12 @@
-import { useEffect, useState, useCallback } from 'react';
+import { useEffect, useMemo, useState, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { fetchNote, createNote, updateNote, uploadImage } from '../api/notes';
+import { fetchNote, fetchNotes, createNote, updateNote, uploadImage } from '../api/notes';
 import type { NoteInput } from '../types';
 import MarkdownEditor from '../components/MarkdownEditor';
 import LiveEditor from '../components/LiveEditor';
 import { isLiveOnly, extractLive, wrapLive } from '../utils/liveBlock';
+import { buildTree, flattenTree, isDescendant } from '../utils/tree';
 import { useDocumentTitle } from '../hooks/useDocumentTitle';
 import './editor.css';
 
@@ -41,6 +42,18 @@ export default function Editor() {
     queryFn: () => fetchNote(id!),
     enabled: isEdit
   });
+
+  // 父级下拉选项：现有笔记按层级缩进；编辑时排除自身及其子孙（防自指/成环）
+  const { data: allNotes } = useQuery({ queryKey: ['notes', true], queryFn: () => fetchNotes() });
+  const parentOptions = useMemo(() => {
+    const tree = buildTree(allNotes ?? []);
+    const selfId = isEdit ? Number(id) : null;
+    const selfNode =
+      selfId != null ? flattenTree(tree).find((n) => n.id === selfId) ?? null : null;
+    return flattenTree(tree).filter(
+      (n) => n.id !== selfId && !(selfNode && isDescendant(selfNode, n.id))
+    );
+  }, [allNotes, id, isEdit]);
 
   useEffect(() => {
     if (existing) {
@@ -165,13 +178,18 @@ export default function Editor() {
           onChange={(e) => update({ summary: e.target.value })}
         />
         <div className="editor-row">
-          <input
+          <select
             className="input"
-            type="number"
-            placeholder="父级笔记 id（-1 为顶级）"
             value={form.parent}
-            onChange={(e) => update({ parent: parseInt(e.target.value, 10) || -1 })}
-          />
+            onChange={(e) => update({ parent: parseInt(e.target.value, 10) })}
+          >
+            <option value={-1}>顶级笔记（无父级）</option>
+            {parentOptions.map((n) => (
+              <option key={n.id} value={n.id}>
+                {`${'　'.repeat(n.depth)}${n.title}`}
+              </option>
+            ))}
+          </select>
           <select
             className="input"
             value={form.recommend}
