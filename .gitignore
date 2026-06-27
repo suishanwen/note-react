@@ -9,3 +9,5 @@ server/uploads/
 server/public/
 .trigger/
 .backups/
+# 本地临时调试脚本（_xxx.mjs）
+**/_*.mjs
