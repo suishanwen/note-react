@@ -1,22 +1,15 @@
 import { useEffect, useState, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import MDEditor, { commands } from '@uiw/react-md-editor';
 import { fetchNote, createNote, updateNote, uploadImage } from '../api/notes';
 import type { NoteInput } from '../types';
-import Markdown from '../components/Markdown';
-import RichEditor from '../components/RichEditor';
+import MarkdownEditor from '../components/MarkdownEditor';
 import LiveEditor from '../components/LiveEditor';
-import LiveTableEditor from '../components/LiveTableEditor';
-import { isLiveOnly, extractLive, wrapLive, hasTable } from '../utils/liveBlock';
-import { toEditableHtml } from '../utils/content';
+import { isLiveOnly, extractLive, wrapLive } from '../utils/liveBlock';
 import './editor.css';
 
-// 编辑器预览复用正文渲染：```live 块在预览里即沙箱运行，所见即所得
-const previewRender = (source: string) => <Markdown content={source} />;
-
-// 文档(所见即所得) / 源码(Markdown·HTML) / 应用(可运行 live)
-type EditMode = 'rich' | 'source' | 'live';
+// 文档(Markdown) / 应用(可运行 live)。统一以 Markdown 为存储格式
+type EditMode = 'markdown' | 'live';
 
 const DRAFT_KEY = 'note_draft_new';
 
@@ -36,7 +29,7 @@ export default function Editor() {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const [form, setForm] = useState<NoteInput>(empty);
-  const [mode, setMode] = useState<EditMode>('rich');
+  const [mode, setMode] = useState<EditMode>('markdown');
   const [errorMsg, setErrorMsg] = useState('');
 
   // 编辑模式：拉取原数据填充
@@ -49,19 +42,17 @@ export default function Editor() {
   useEffect(() => {
     if (existing) {
       const raw = existing.content ?? '';
-      const live = isLiveOnly(raw);
-      // 文档模式以 HTML 为载体，加载时一次性把 Markdown 转 HTML（live 保留原样），
-      // 之后 content 始终是 HTML，避免编辑器每次渲染重复转换造成循环/白屏
+      // content 始终是 Markdown（live 笔记为 ```live 块），加载时原样填入，不做格式转换
       setForm({
         parent: existing.parent ?? -1,
         title: existing.title ?? '',
-        content: live ? raw : toEditableHtml(raw),
+        content: raw,
         summary: existing.summary ?? '',
         tag: existing.tag ?? '',
         poster: existing.poster ?? '',
         recommend: existing.recommend ?? 0
       });
-      setMode(live ? 'live' : 'rich');
+      setMode(isLiveOnly(raw) ? 'live' : 'markdown');
     }
   }, [existing]);
 
@@ -88,20 +79,13 @@ export default function Editor() {
 
   const update = (patch: Partial<NoteInput>) => setForm((f) => ({ ...f, ...patch }));
 
-  // 切换内容类型：往返转换 content，确保数据不丢（统一存在 content 字段）
+  // 切换内容类型：Markdown ⇄ live 无损往返（都是 Markdown 存储，仅 live 多一层围栏）
   const switchMode = (next: EditMode) => {
     if (next === mode) return;
     setForm((f) => {
       if (next === 'live') {
-        // → 应用：非 live 则把现有正文作为初始源码包进 live 块
         return { ...f, content: isLiveOnly(f.content) ? f.content : wrapLive(f.content) };
       }
-      if (next === 'rich') {
-        // → 文档：从 live 还原内部源码；Markdown 转 HTML 供富文本编辑
-        const raw = isLiveOnly(f.content) ? extractLive(f.content) : f.content;
-        return { ...f, content: toEditableHtml(raw) };
-      }
-      // → 源码：从 live 还原内部源码，其余原样
       return { ...f, content: isLiveOnly(f.content) ? extractLive(f.content) : f.content };
     });
     setMode(next);
@@ -198,49 +182,28 @@ export default function Editor() {
       </div>
 
       <div className="editor-mode">
-        <button type="button" className={mode === 'rich' ? 'active' : ''} onClick={() => switchMode('rich')}>
+        <button type="button" className={mode === 'markdown' ? 'active' : ''} onClick={() => switchMode('markdown')}>
           文档
-        </button>
-        <button type="button" className={mode === 'source' ? 'active' : ''} onClick={() => switchMode('source')}>
-          源码
         </button>
         <button type="button" className={mode === 'live' ? 'active' : ''} onClick={() => switchMode('live')}>
           可运行应用
         </button>
       </div>
 
-      {mode === 'rich' && (
-        <RichEditor value={form.content} onChange={(html) => update({ content: html })} />
-      )}
-
-      {mode === 'source' && (
-        <div className="editor-md" onPaste={handleImage} onDrop={handleImage}>
-          <MDEditor
-            value={form.content}
-            onChange={(v) => update({ content: v ?? '' })}
-            height={460}
-            preview="live"
-            components={{ preview: previewRender }}
-            extraCommands={[commands.codeEdit, commands.codeLive, commands.codePreview]}
-          />
+      {mode === 'markdown' && (
+        <div onPaste={handleImage} onDrop={handleImage}>
+          <MarkdownEditor value={form.content} onChange={(md) => update({ content: md })} />
         </div>
       )}
 
-      {mode === 'live' &&
-        (hasTable(extractLive(form.content)) ? (
-          <LiveTableEditor value={extractLive(form.content)} onChange={onLiveChange} />
-        ) : (
-          <LiveEditor value={extractLive(form.content)} onChange={onLiveChange} />
-        ))}
+      {mode === 'live' && (
+        <LiveEditor value={extractLive(form.content)} onChange={onLiveChange} />
+      )}
 
       <p className="editor-hint">
-        {mode === 'rich' &&
-          '所见即所得：工具栏可视化编辑表格（增删行列）、标题、列表、图片、链接'}
-        {mode === 'source' && '源码模式：直接写 Markdown / HTML，粘贴或拖拽图片自动上传'}
-        {mode === 'live' && hasTable(extractLive(form.content)) &&
-          '表格可视化编辑（自动求和等脚本保留运行），样式与脚本可在下方展开微调'}
-        {mode === 'live' && !hasTable(extractLive(form.content)) &&
-          '左侧编辑 HTML/JS，右侧沙箱实时预览；脚本与主站隔离，无法访问登录凭证'}
+        {mode === 'markdown'
+          ? '左侧写 Markdown（可内嵌 HTML），右侧实时预览；粘贴或拖拽图片自动上传'
+          : '左侧编辑 HTML/JS，右侧沙箱实时预览；脚本与主站隔离，无法访问登录凭证'}
       </p>
 
       {errorMsg && <div className="editor-error">{errorMsg}</div>}

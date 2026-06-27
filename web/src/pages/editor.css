@@ -26,11 +26,6 @@
   user-select: none;
 }
 
-.editor-md {
-  border-radius: var(--radius-sm);
-  overflow: hidden;
-}
-
 /* 内容类型切换 */
 .editor-mode {
   display: flex;
