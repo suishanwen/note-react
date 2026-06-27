@@ -1,4 +1,4 @@
-import ReactMarkdown, { defaultUrlTransform } from 'react-markdown';
+import ReactMarkdown, { defaultUrlTransform, type Components } from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import rehypeRaw from 'rehype-raw';
 import rehypeHighlight from 'rehype-highlight';
@@ -32,8 +32,8 @@ function childrenToText(children: unknown): string {
 }
 
 // ```live 代码块改用沙箱 iframe 执行；其它代码块照常高亮显示
-const components = {
-  code({ className, children, ...props }: any) {
+const components: Components = {
+  code({ className, children, ...props }) {
     if (/\blanguage-live\b/.test(className || '')) {
       return <LiveBlock html={childrenToText(children)} />;
     }
