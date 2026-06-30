@@ -4,7 +4,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { fetchNote, fetchNotes, createNote, updateNote, uploadImage } from '../api/notes';
 import type { NoteInput } from '../types';
 import MarkdownEditor from '../components/MarkdownEditor';
-import LiveEditor from '../components/LiveEditor';
+import LiveTableEditor from '../components/LiveTableEditor';
 import { isLiveOnly, extractLive, wrapLive } from '../utils/liveBlock';
 import { buildTree, flattenTree, isDescendant } from '../utils/tree';
 import { useDocumentTitle } from '../hooks/useDocumentTitle';
@@ -218,13 +218,13 @@ export default function Editor() {
       )}
 
       {mode === 'live' && (
-        <LiveEditor value={extractLive(form.content)} onChange={onLiveChange} />
+        <LiveTableEditor value={extractLive(form.content)} onChange={onLiveChange} />
       )}
 
       <p className="editor-hint">
         {mode === 'markdown'
           ? '左侧写 Markdown（可内嵌 HTML），右侧实时预览；粘贴或拖拽图片自动上传'
-          : '左侧编辑 HTML/JS，右侧沙箱实时预览；脚本与主站隔离，无法访问登录凭证'}
+          : '可视化改表格数据或直接编辑 HTML/JS；脚本与主站隔离，无法访问登录凭证'}
       </p>
 
       {errorMsg && <div className="editor-error">{errorMsg}</div>}
