@@ -2,6 +2,7 @@ import { useEffect, useRef, useState, type ReactNode } from 'react';
 import CodeMirror from '@uiw/react-codemirror';
 import { oneDark } from '@codemirror/theme-one-dark';
 import type { Extension } from '@codemirror/state';
+import type { EditorView } from '@codemirror/view';
 import './liveEditor.css';
 
 interface Props {
@@ -16,6 +17,10 @@ interface Props {
   previewLabel: string;
   // 预览渲染：用防抖后的内容渲染右栏
   renderPreview: (value: string) => ReactNode;
+  // 左栏标题右侧的工具栏插槽（如 Markdown 的「代码块」按钮）
+  toolbar?: ReactNode;
+  // 暴露 CodeMirror 实例，供工具栏操作选区
+  onCreateEditor?: (view: EditorView) => void;
 }
 
 // 分栏编辑器：左 CodeMirror 源码，右防抖实时预览。
@@ -26,7 +31,9 @@ export default function SplitEditor({
   extensions,
   editorLabel,
   previewLabel,
-  renderPreview
+  renderPreview,
+  toolbar,
+  onCreateEditor
 }: Props) {
   const [preview, setPreview] = useState(value);
   const isDark =
@@ -45,13 +52,17 @@ export default function SplitEditor({
   return (
     <div className="live-editor">
       <div className="live-editor-pane">
-        <div className="live-editor-label">{editorLabel}</div>
+        <div className="live-editor-label">
+          <span>{editorLabel}</span>
+          {toolbar && <div className="live-editor-toolbar">{toolbar}</div>}
+        </div>
         <CodeMirror
           value={value}
           height="460px"
           theme={isDark ? oneDark : 'light'}
           extensions={extensions}
           onChange={onChange}
+          onCreateEditor={onCreateEditor}
           basicSetup={{ lineNumbers: true, foldGutter: true, highlightActiveLine: true }}
         />
       </div>
