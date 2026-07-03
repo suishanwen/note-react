@@ -1,9 +1,6 @@
+/* 侧栏内的树：无外框，紧凑行距 */
 .note-tree-wrap {
-  background: var(--bg-elevated);
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  box-shadow: var(--shadow-sm);
-  padding: 6px;
+  padding: 2px 0;
 }
 
 .note-tree {
@@ -14,8 +11,8 @@
 
 /* 子级缩进 + 层级竖线 */
 .tree-children {
-  margin-left: 15px;
-  padding-left: 9px;
+  margin-left: 14px;
+  padding-left: 8px;
   border-left: 1px solid var(--border);
 }
 
@@ -27,9 +24,9 @@
   position: relative;
   display: flex;
   align-items: center;
-  gap: 4px;
-  padding: 7px 10px 7px 8px;
-  border-radius: var(--radius-sm);
+  gap: 3px;
+  padding: 5px 8px 5px 4px;
+  border-radius: 7px;
   border: 1px solid transparent;
   transition: background var(--transition), box-shadow var(--transition);
   /* 触屏长按拖拽：禁用文字选择与 iOS 长按弹出菜单 */
@@ -42,12 +39,26 @@
   background: var(--bg-subtle);
 }
 
+/* 当前阅读中的笔记 */
+.tree-row-active {
+  background: var(--accent-soft);
+}
+
+.tree-row-active .tree-title {
+  color: var(--accent);
+  font-weight: 650;
+}
+
+.tree-row-active:hover {
+  background: var(--accent-soft);
+}
+
 /* 加密/推荐：左侧色条 */
 .tree-row-enc::before,
 .tree-row-rec::before {
   content: '';
   position: absolute;
-  left: 0;
+  left: -2px;
   top: 6px;
   bottom: 6px;
   width: 3px;
@@ -185,8 +196,9 @@
 
 .tree-title {
   flex: none;
-  max-width: 100%;
-  font-size: 14.5px;
+  min-width: 0;
+  flex-shrink: 1;
+  font-size: 13.5px;
   font-weight: 550;
   color: var(--text);
   overflow: hidden;
@@ -198,14 +210,20 @@
   color: var(--accent);
 }
 
-.tree-summary {
-  flex: 1;
-  min-width: 0;
-  font-size: 12.5px;
+/* 子笔记数量 */
+.tree-count {
+  flex: none;
+  font-family: var(--font-mono);
+  font-size: 10.5px;
   color: var(--text-faint);
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+  background: var(--bg-subtle);
+  border-radius: 999px;
+  padding: 0 6px;
+  line-height: 16px;
+}
+
+.tree-row-active .tree-count {
+  background: color-mix(in srgb, var(--accent) 14%, transparent);
 }
 
 /* 右侧元信息：标签 + 时间（如目录页码） */
@@ -216,47 +234,34 @@
   gap: 6px;
 }
 
-.tree-time {
-  font-family: var(--font-mono);
-  font-size: 11px;
-  color: var(--text-faint);
-  white-space: nowrap;
-  font-variant-numeric: tabular-nums;
-  min-width: 52px;
-  text-align: right;
+/* 悬停才显示标签，保持列表干净 */
+.tree-meta .tag {
+  opacity: 0;
+  transition: opacity var(--transition);
 }
 
-/* 移动端：收起摘要与标签，保留树骨架与时间 */
-@media (max-width: 640px) {
-  .note-tree-wrap {
-    padding: 4px;
-    /* 全面屏：去左右边框圆角，铺满屏宽 */
-    border-left: none;
-    border-right: none;
-    border-radius: 0;
-  }
+.tree-row:hover .tree-meta .tag {
+  opacity: 1;
+}
+
+/* 移动端（抽屉内）：加大点击区，隐藏标签 */
+@media (max-width: 900px) {
   .tree-row {
-    padding: 9px 8px;
+    padding: 8px 8px 8px 4px;
     gap: 2px;
   }
   .tree-title {
     font-size: 15px;
   }
-  .tree-summary {
-    display: none;
-  }
   .tree-meta .tag {
     display: none;
   }
   .tree-children {
-    margin-left: 9px;
+    margin-left: 10px;
     padding-left: 7px;
   }
   .tree-toggle {
     width: 28px;
     height: 28px;
-  }
-  .tree-time {
-    min-width: 44px;
   }
 }

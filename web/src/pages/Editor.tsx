@@ -1,10 +1,12 @@
-import { useEffect, useMemo, useState, useCallback } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useEffect, useMemo, useRef, useState, useCallback } from 'react';
+import { useParams, useNavigate, useBlocker } from 'react-router-dom';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { fetchNote, fetchNotes, createNote, updateNote, uploadImage } from '../api/notes';
 import type { NoteInput } from '../types';
 import MarkdownEditor from '../components/MarkdownEditor';
 import LiveTableEditor from '../components/LiveTableEditor';
+import { useToast } from '../components/Toast';
+import { useConfirm } from '../components/ConfirmDialog';
 import { isLiveOnly, extractLive, wrapLive } from '../utils/liveBlock';
 import { buildTree, flattenTree, isDescendant } from '../utils/tree';
 import { useDocumentTitle } from '../hooks/useDocumentTitle';
@@ -30,9 +32,15 @@ export default function Editor() {
   const isEdit = !!id;
   const navigate = useNavigate();
   const queryClient = useQueryClient();
+  const { toast } = useToast();
+  const { confirm } = useConfirm();
   const [form, setForm] = useState<NoteInput>(empty);
   const [mode, setMode] = useState<EditMode>('markdown');
   const [errorMsg, setErrorMsg] = useState('');
+  // 基线快照：与当前表单比对判断“未保存”
+  const [baseline, setBaseline] = useState<string>(JSON.stringify(empty));
+  // 保存成功后跳转不触发拦截
+  const skipBlock = useRef(false);
 
   useDocumentTitle(isEdit ? `编辑 · ${form.title || '笔记'}` : '新建笔记');
 
@@ -59,7 +67,7 @@ export default function Editor() {
     if (existing) {
       const raw = existing.content ?? '';
       // content 始终是 Markdown（live 笔记为 ```live 块），加载时原样填入，不做格式转换
-      setForm({
+      const filled: NoteInput = {
         parent: existing.parent ?? -1,
         title: existing.title ?? '',
         content: raw,
@@ -67,7 +75,9 @@ export default function Editor() {
         tag: existing.tag ?? '',
         poster: existing.poster ?? '',
         recommend: existing.recommend ?? 0
-      });
+      };
+      setForm(filled);
+      setBaseline(JSON.stringify(filled));
       setMode(isLiveOnly(raw) ? 'live' : 'markdown');
     }
   }, [existing]);
@@ -78,13 +88,16 @@ export default function Editor() {
       const draft = localStorage.getItem(DRAFT_KEY);
       if (draft) {
         try {
-          setForm(JSON.parse(draft));
+          const parsed = JSON.parse(draft) as NoteInput;
+          setForm(parsed);
+          setMode(isLiveOnly(parsed.content) ? 'live' : 'markdown');
+          toast('已恢复未保存的草稿', 'info');
         } catch {
           localStorage.removeItem(DRAFT_KEY);
         }
       }
     }
-  }, [isEdit]);
+  }, [isEdit, toast]);
 
   // 新建模式：自动保存草稿
   useEffect(() => {
@@ -94,6 +107,40 @@ export default function Editor() {
   }, [form, isEdit]);
 
   const update = (patch: Partial<NoteInput>) => setForm((f) => ({ ...f, ...patch }));
+
+  const isDirty = JSON.stringify(form) !== baseline && !skipBlock.current;
+  // 新建模式有 localStorage 草稿兜底，只拦截编辑已有笔记
+  const shouldBlock = isEdit && isDirty;
+
+  // 站内导航拦截：未保存时确认
+  const blocker = useBlocker(shouldBlock);
+  useEffect(() => {
+    if (blocker.state !== 'blocked') return;
+    let cancelled = false;
+    confirm({
+      title: '放弃未保存的修改？',
+      message: '当前笔记有未保存的修改，离开后将丢失。',
+      confirmText: '放弃修改',
+      danger: true
+    }).then((ok) => {
+      if (cancelled) return;
+      if (ok) blocker.proceed();
+      else blocker.reset();
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, [blocker, confirm]);
+
+  // 关闭/刷新页面拦截
+  useEffect(() => {
+    if (!shouldBlock) return;
+    const onBeforeUnload = (e: BeforeUnloadEvent) => {
+      e.preventDefault();
+    };
+    window.addEventListener('beforeunload', onBeforeUnload);
+    return () => window.removeEventListener('beforeunload', onBeforeUnload);
+  }, [shouldBlock]);
 
   // 切换内容类型：Markdown ⇄ live 无损往返（都是 Markdown 存储，仅 live 多一层围栏）
   const switchMode = (next: EditMode) => {
@@ -117,19 +164,37 @@ export default function Editor() {
       if (!isEdit) localStorage.removeItem(DRAFT_KEY);
       queryClient.invalidateQueries({ queryKey: ['notes'] });
       queryClient.invalidateQueries({ queryKey: ['note', String(res.id)] });
+      toast('已保存', 'success');
+      skipBlock.current = true;
       navigate(`/note/${res.id}`);
     },
-    onError: (err: Error) => setErrorMsg(err.message)
+    onError: (err: Error) => {
+      setErrorMsg(err.message);
+      toast(err.message, 'error');
+    }
   });
 
-  const onSubmit = () => {
+  const onSubmit = useCallback(() => {
     setErrorMsg('');
     if (!form.title.trim()) {
       setErrorMsg('标题不能为空');
+      toast('标题不能为空', 'error');
       return;
     }
     saveMutation.mutate(form);
-  };
+  }, [form, saveMutation, toast]);
+
+  // Cmd/Ctrl+S 保存
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 's') {
+        e.preventDefault();
+        if (!saveMutation.isPending) onSubmit();
+      }
+    };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, [onSubmit, saveMutation.isPending]);
 
   // 粘贴/拖拽图片自动上传并插入 Markdown
   const handleImage = useCallback(async (event: React.ClipboardEvent | React.DragEvent) => {
@@ -230,11 +295,13 @@ export default function Editor() {
       {errorMsg && <div className="editor-error">{errorMsg}</div>}
 
       <div className="editor-actions">
+        <span className="editor-dirty">{isDirty ? '有未保存的修改' : ''}</span>
         <button className="btn" onClick={() => navigate(-1)}>
           返回
         </button>
         <button className="btn btn-primary" disabled={saveMutation.isPending} onClick={onSubmit}>
           {saveMutation.isPending ? '保存中…' : '保存'}
+          <kbd className="editor-kbd">⌘S</kbd>
         </button>
       </div>
     </div>

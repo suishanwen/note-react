@@ -1,0 +1,172 @@
+.home-page {
+  max-width: var(--w-read);
+  margin: 0 auto;
+}
+
+.home-section {
+  margin-bottom: 36px;
+}
+
+.home-heading {
+  margin: 0 0 14px;
+  font-size: 13px;
+  font-weight: 650;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--text-faint);
+}
+
+.home-card-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: 12px;
+}
+
+.home-card {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 14px 16px;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  background: var(--bg-elevated);
+  color: var(--text);
+  box-shadow: var(--shadow-sm);
+  transition: border-color var(--transition), box-shadow var(--transition),
+    transform var(--transition);
+}
+
+.home-card:hover {
+  text-decoration: none;
+  border-color: var(--accent);
+  box-shadow: var(--shadow);
+  transform: translateY(-1px);
+}
+
+.home-card-rec {
+  border-left: 3px solid var(--accent);
+}
+
+.home-card-title {
+  font-size: 14.5px;
+  font-weight: 600;
+  line-height: 1.4;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.home-card-summary {
+  font-size: 12.5px;
+  color: var(--text-muted);
+  line-height: 1.5;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.home-card-meta {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: auto;
+  font-size: 11.5px;
+  color: var(--text-faint);
+  font-family: var(--font-mono);
+}
+
+.home-recent {
+  display: flex;
+  flex-direction: column;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--bg-elevated);
+  overflow: hidden;
+}
+
+.home-recent-row {
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+  padding: 11px 16px;
+  color: var(--text);
+  border-bottom: 1px solid var(--border);
+  transition: background var(--transition);
+}
+
+.home-recent-row:last-child {
+  border-bottom: none;
+}
+
+.home-recent-row:hover {
+  background: var(--bg-subtle);
+  text-decoration: none;
+}
+
+.home-recent-title {
+  flex: none;
+  max-width: 55%;
+  font-size: 14px;
+  font-weight: 550;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.home-flag {
+  font-size: 12px;
+  margin-right: 5px;
+}
+
+.home-recent-summary {
+  flex: 1;
+  min-width: 0;
+  font-size: 12.5px;
+  color: var(--text-faint);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.home-recent-time {
+  flex: none;
+  margin-left: auto;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--text-faint);
+  font-variant-numeric: tabular-nums;
+}
+
+.home-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+  padding-top: 18vh;
+  text-align: center;
+}
+
+.home-empty-title {
+  margin: 0;
+  font-size: 17px;
+  font-weight: 600;
+  color: var(--text-muted);
+}
+
+.home-empty-sub {
+  margin: 0;
+  font-size: 13.5px;
+  color: var(--text-faint);
+}
+
+@media (max-width: 900px) {
+  .home-recent-summary {
+    display: none;
+  }
+  .home-recent-title {
+    flex: 1;
+    max-width: none;
+  }
+}

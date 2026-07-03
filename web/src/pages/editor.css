@@ -71,13 +71,32 @@
 
 .editor-actions {
   display: flex;
+  align-items: center;
   justify-content: flex-end;
   gap: 12px;
   margin-top: 20px;
 }
 
+.editor-dirty {
+  margin-right: auto;
+  font-size: 12.5px;
+  color: var(--gold);
+}
+
+.editor-kbd {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  padding: 1px 4px;
+  border-radius: 3px;
+  background: rgba(255, 255, 255, 0.18);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+}
+
 @media (max-width: 600px) {
   .editor-row {
     grid-template-columns: 1fr;
+  }
+  .editor-kbd {
+    display: none;
   }
 }
