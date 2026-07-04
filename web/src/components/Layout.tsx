@@ -1,4 +1,4 @@
-import { Link, Outlet, useLocation, useMatch, useNavigate } from 'react-router-dom';
+import { Link, Outlet, ScrollRestoration, useLocation, useMatch, useNavigate } from 'react-router-dom';
 import { Suspense, lazy, useCallback, useEffect, useRef, useState } from 'react';
 import { useMutation } from '@tanstack/react-query';
 import { useAuth } from '../auth';
@@ -37,18 +37,20 @@ export default function Layout() {
   const noteMatch = useMatch('/note/:id');
   const activeId = noteMatch ? Number(noteMatch.params.id) : null;
 
-  // 路由切换时自动收起移动端抽屉
+  // 路由切换时自动收起移动端抽屉与搜索页
   useEffect(() => {
     setDrawerOpen(false);
+    setPaletteOpen(false);
   }, [location.pathname]);
 
-  // 抽屉是文档流视图而非 fixed 覆盖层（fixed 全屏层会让 Safari 展开工具栏、信号栏垫灰底）。
-  // 打开时记住主内容滚动位置并回顶展示抽屉；原路关闭时恢复，跳转新页面则交给页面自己回顶
+  // 抽屉/搜索是文档流全屏视图而非 fixed 覆盖层（fixed 全屏层会让 iOS Safari 给信号栏垫灰底）。
+  // 打开时记住滚动位置并回顶；原路关闭时恢复，跳转新页面时已在顶部无需处理（详情页另有回顶）
+  const overlayOpen = isMobile && (drawerOpen || paletteOpen);
   const savedScroll = useRef(0);
   const openedAtPath = useRef('');
   useEffect(() => {
     if (!isMobile) return;
-    if (drawerOpen) {
+    if (overlayOpen) {
       savedScroll.current = window.scrollY;
       openedAtPath.current = location.pathname;
       window.scrollTo(0, 0);
@@ -56,7 +58,7 @@ export default function Layout() {
       window.scrollTo(0, savedScroll.current);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [drawerOpen, isMobile]);
+  }, [overlayOpen, isMobile]);
 
   // 全局快捷键：Cmd/Ctrl+K 命令面板
   useEffect(() => {
@@ -196,7 +198,7 @@ export default function Layout() {
           </aside>
         )}
 
-        <main className="workbench-main" hidden={isMobile && drawerOpen}>
+        <main className="workbench-main" hidden={overlayOpen}>
           <ErrorBoundary>
             <Suspense fallback={<Fallback />}>
               <Outlet />
@@ -210,6 +212,10 @@ export default function Layout() {
           <CommandPalette onClose={() => setPaletteOpen(false)} />
         </Suspense>
       )}
+
+      {/* 路由切换回顶：iOS Safari 在工具栏展开且页面滚动位置非 0 时会给信号栏垫灰底，
+          SPA 跳转（pushState）恰好触发工具栏展开，故每次导航都从顶部开始 */}
+      <ScrollRestoration />
     </div>
   );
 }

@@ -148,6 +148,9 @@ export default function CommandPalette({ onClose }: Props) {
             onKeyDown={onKeyDown}
           />
           <kbd className="palette-esc">Esc</kbd>
+          <button type="button" className="palette-close" onClick={onClose} aria-label="关闭搜索">
+            取消
+          </button>
         </div>
 
         <ul className="palette-list" ref={listRef} role="listbox">

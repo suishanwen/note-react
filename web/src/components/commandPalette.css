@@ -69,6 +69,18 @@
   color: var(--text-faint);
 }
 
+/* 移动端全面屏搜索的取消按钮，桌面隐藏（桌面用 Esc/点外部） */
+.palette-close {
+  display: none;
+  flex: none;
+  margin-right: 12px;
+  padding: 6px 10px;
+  border: none;
+  background: none;
+  color: var(--accent);
+  font-size: 14px;
+}
+
 .palette-list {
   flex: 1;
   min-height: 0;
@@ -164,9 +176,49 @@
   background: var(--bg-subtle);
 }
 
-@media (max-width: 640px) {
+/* 移动端（与 Layout 的 isMobile 断点一致）：改为文档流全屏搜索页。
+   fixed 覆盖层会让 Safari 保持工具栏展开、信号栏垫灰底；
+   文档流页面与正文一样原生滚动，信号栏下照常透出内容 */
+@media (max-width: 900px) {
   .palette-backdrop {
-    padding-top: max(16px, var(--safe-top));
+    position: static;
+    display: block;
+    min-height: 100dvh;
+    padding: 0;
+    background: var(--bg);
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+    animation: none;
+  }
+  .palette {
+    width: 100%;
+    max-height: none;
+    background: var(--bg);
+    border: none;
+    border-radius: 0;
+    box-shadow: none;
+    overflow: visible;
+    animation: none;
+  }
+  /* 让出顶部悬浮栏的高度，输入框不被悬浮按钮压住 */
+  .palette-input-wrap {
+    padding-top: calc(var(--safe-top) + var(--mobile-topbar-height));
+  }
+  .palette-esc {
+    display: none;
+  }
+  .palette-close {
+    display: inline-flex;
+  }
+  /* 结果列表随文档滚动，不做内部滚动容器 */
+  .palette-list {
+    flex: none;
+    overflow-y: visible;
+    padding-bottom: calc(16px + var(--safe-bottom));
+  }
+  /* 键盘操作提示对触屏无意义 */
+  .palette-foot {
+    display: none;
   }
   .palette-hint {
     display: none;
