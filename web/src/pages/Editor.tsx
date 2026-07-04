@@ -161,7 +161,9 @@ export default function Editor() {
   const saveMutation = useMutation({
     mutationFn: (input: NoteInput) =>
       isEdit ? updateNote(Number(id), input) : createNote(input),
-    onSuccess: (res) => {
+    onSuccess: (res, saved) => {
+      // 已保存内容即新基线，dirty 状态就地清零
+      setBaseline(JSON.stringify(saved));
       if (!isEdit) localStorage.removeItem(DRAFT_KEY);
       queryClient.invalidateQueries({ queryKey: ['notes'] });
       queryClient.invalidateQueries({ queryKey: ['note', String(res.id)] });

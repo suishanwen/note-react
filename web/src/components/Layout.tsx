@@ -42,26 +42,9 @@ export default function Layout() {
     setDrawerOpen(false);
   }, [location.pathname]);
 
-  // 抽屉打开时锁定背景滚动：body 定格并记录滚动位置，关闭后原位恢复。
-  // 不能用 overflow:hidden——移动端滚动主体是 body，会坍塌滚动位置并破坏 Safari 全屏滚动状态
-  useEffect(() => {
-    if (!(drawerOpen && isMobile)) return;
-    const scrollY = window.scrollY;
-    const { style } = document.body;
-    style.position = 'fixed';
-    style.top = `-${scrollY}px`;
-    style.left = '0';
-    style.right = '0';
-    style.width = '100%';
-    return () => {
-      style.position = '';
-      style.top = '';
-      style.left = '';
-      style.right = '';
-      style.width = '';
-      window.scrollTo(0, scrollY);
-    };
-  }, [drawerOpen, isMobile]);
+  // 抽屉打开不锁 body：任何形式的锁滚（overflow:hidden / position:fixed）都会让文档
+  // 变为不可滚动，iOS Safari 随即重新展开工具栏，丢失全屏滚动状态。
+  // 背景滚动改由 CSS touch-action 在遮罩与抽屉非滚动区拦截（见 layout.css）
 
   // 全局快捷键：Cmd/Ctrl+K 命令面板
   useEffect(() => {

@@ -158,6 +158,8 @@
 .drawer-backdrop.open {
   opacity: 1;
   pointer-events: auto;
+  /* 拦截触摸滚动，背景不跟随；不锁 body，保住 Safari 全屏滚动状态 */
+  touch-action: none;
 }
 
 .workbench-drawer {
@@ -180,6 +182,12 @@
 
 .workbench-drawer.open {
   transform: translateX(0);
+  /* 抽屉自身非滚动区（头/尾）不把触摸传给 body；树区单独放行纵向滚动 */
+  touch-action: none;
+}
+
+.workbench-drawer.open .sidebar-tree {
+  touch-action: pan-y;
 }
 
 .drawer-head {
