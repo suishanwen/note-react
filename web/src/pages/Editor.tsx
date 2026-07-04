@@ -215,48 +215,82 @@ export default function Editor() {
 
   return (
     <div className="editor-page">
-      <div className="editor-fields">
-        <input
-          className="input editor-title"
-          placeholder="标题"
-          value={form.title}
-          onChange={(e) => update({ title: e.target.value })}
-        />
-        <div className="editor-row">
+      <div className="editor-bar">
+        <div className="editor-mode" role="tablist" aria-label="内容类型">
+          <button
+            type="button"
+            role="tab"
+            aria-selected={mode === 'markdown'}
+            className={mode === 'markdown' ? 'active' : ''}
+            onClick={() => switchMode('markdown')}
+          >
+            文档
+          </button>
+          <button
+            type="button"
+            role="tab"
+            aria-selected={mode === 'live'}
+            className={mode === 'live' ? 'active' : ''}
+            onClick={() => switchMode('live')}
+          >
+            应用
+          </button>
+        </div>
+        <span className="editor-dirty">{isDirty ? '未保存' : ''}</span>
+        <div className="editor-bar-actions">
+          <button className="btn" onClick={() => navigate(-1)}>
+            返回
+          </button>
+          <button className="btn btn-primary" disabled={saveMutation.isPending} onClick={onSubmit}>
+            {saveMutation.isPending ? '保存中…' : '保存'}
+            <kbd className="editor-kbd">⌘S</kbd>
+          </button>
+        </div>
+      </div>
+
+      <input
+        className="editor-title"
+        placeholder="无标题"
+        value={form.title}
+        onChange={(e) => update({ title: e.target.value })}
+      />
+
+      <div className="editor-meta">
+        <label className="meta-field">
+          <span className="meta-label">作者</span>
           <input
-            className="input"
-            placeholder="作者"
+            size={8}
+            placeholder="佚名"
             value={form.poster}
             onChange={(e) => update({ poster: e.target.value })}
           />
+        </label>
+        <label className="meta-field">
+          <span className="meta-label">标签</span>
           <input
-            className="input"
-            placeholder="标签（用 | 分隔）"
+            size={14}
+            placeholder="用 | 分隔"
             value={form.tag}
             onChange={(e) => update({ tag: e.target.value })}
           />
-        </div>
-        <input
-          className="input"
-          placeholder="摘要（列表页展示）"
-          value={form.summary}
-          onChange={(e) => update({ summary: e.target.value })}
-        />
-        <div className="editor-row">
+        </label>
+        <label className="meta-field">
+          <span className="meta-label">父级</span>
           <select
-            className="input"
             value={form.parent}
             onChange={(e) => update({ parent: parseInt(e.target.value, 10) })}
           >
-            <option value={-1}>顶级笔记（无父级）</option>
+            <option value={-1}>无（顶级）</option>
             {parentOptions.map((n) => (
               <option key={n.id} value={n.id}>
                 {`${'　'.repeat(n.depth)}${n.title}`}
               </option>
             ))}
           </select>
+        </label>
+        <label className="meta-field">
+          <span className="meta-label">状态</span>
           <select
-            className="input"
             value={form.recommend}
             onChange={(e) => update({ recommend: parseInt(e.target.value, 10) })}
           >
@@ -264,16 +298,15 @@ export default function Editor() {
             <option value={1}>推荐</option>
             <option value={-1}>加密</option>
           </select>
-        </div>
-      </div>
-
-      <div className="editor-mode">
-        <button type="button" className={mode === 'markdown' ? 'active' : ''} onClick={() => switchMode('markdown')}>
-          文档
-        </button>
-        <button type="button" className={mode === 'live' ? 'active' : ''} onClick={() => switchMode('live')}>
-          可运行应用
-        </button>
+        </label>
+        <label className="meta-field meta-field-summary">
+          <span className="meta-label">摘要</span>
+          <input
+            placeholder="列表页展示的一句话简介"
+            value={form.summary}
+            onChange={(e) => update({ summary: e.target.value })}
+          />
+        </label>
       </div>
 
       {mode === 'markdown' && (
@@ -293,17 +326,6 @@ export default function Editor() {
       </p>
 
       {errorMsg && <div className="editor-error">{errorMsg}</div>}
-
-      <div className="editor-actions">
-        <span className="editor-dirty">{isDirty ? '有未保存的修改' : ''}</span>
-        <button className="btn" onClick={() => navigate(-1)}>
-          返回
-        </button>
-        <button className="btn btn-primary" disabled={saveMutation.isPending} onClick={onSubmit}>
-          {saveMutation.isPending ? '保存中…' : '保存'}
-          <kbd className="editor-kbd">⌘S</kbd>
-        </button>
-      </div>
     </div>
   );
 }
