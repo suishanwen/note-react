@@ -144,31 +144,33 @@
   padding: 28px 32px calc(40px + var(--safe-bottom));
 }
 
-/* 移动端抽屉：全面屏覆盖，与主界面同底色，无遮罩无阴影 */
+/* 移动端抽屉：文档流内的全屏视图（非 fixed 覆盖层）。
+   覆盖层会让文档不可滚动，Safari 随即展开工具栏并给信号栏垫灰底；
+   文档流视图跟主内容一样走原生滚动，信号栏下照常透出内容 */
 .workbench-drawer {
-  position: fixed;
-  inset: 0;
-  z-index: 100;
-  background: var(--bg);
+  min-height: 100dvh;
   display: flex;
   flex-direction: column;
-  padding-top: var(--safe-top);
-  padding-bottom: var(--safe-bottom);
-  transform: translateX(-102%);
-  transition: transform 0.26s cubic-bezier(0.3, 0.8, 0.3, 1);
-  visibility: hidden;
-  transition-property: transform, visibility;
+  background: var(--bg);
+  padding-top: calc(var(--safe-top) + var(--mobile-topbar-height));
+  animation: drawer-in 0.22s cubic-bezier(0.3, 0.8, 0.3, 1);
 }
 
-.workbench-drawer.open {
-  transform: translateX(0);
-  visibility: visible;
-  /* 非滚动区（头/尾）不把触摸传给 body，保住 Safari 全屏滚动状态；树区单独放行纵向滚动 */
-  touch-action: none;
+@keyframes drawer-in {
+  from {
+    opacity: 0;
+    transform: translateX(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
 }
 
-.workbench-drawer.open .sidebar-tree {
-  touch-action: pan-y;
+/* 笔记树随文档滚动，不做内部滚动容器 */
+.workbench-drawer .sidebar-tree {
+  flex: none;
+  overflow-y: visible;
 }
 
 .drawer-head {
@@ -189,7 +191,8 @@
   flex: none;
   display: flex;
   gap: 10px;
-  padding: 12px max(14px, var(--safe-right)) 12px max(14px, var(--safe-left));
+  padding: 12px max(14px, var(--safe-right)) calc(12px + var(--safe-bottom))
+    max(14px, var(--safe-left));
   border-top: 1px solid var(--border);
 }
 
@@ -253,6 +256,6 @@
 
 @media (prefers-reduced-motion: reduce) {
   .workbench-drawer {
-    transition: none;
+    animation: none;
   }
 }

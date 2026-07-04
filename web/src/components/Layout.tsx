@@ -1,5 +1,5 @@
 import { Link, Outlet, useLocation, useMatch, useNavigate } from 'react-router-dom';
-import { Suspense, lazy, useCallback, useEffect, useState } from 'react';
+import { Suspense, lazy, useCallback, useEffect, useRef, useState } from 'react';
 import { useMutation } from '@tanstack/react-query';
 import { useAuth } from '../auth';
 import { useTheme } from '../hooks/useTheme';
@@ -42,9 +42,21 @@ export default function Layout() {
     setDrawerOpen(false);
   }, [location.pathname]);
 
-  // 抽屉打开不锁 body：任何形式的锁滚（overflow:hidden / position:fixed）都会让文档
-  // 变为不可滚动，iOS Safari 随即重新展开工具栏，丢失全屏滚动状态。
-  // 背景滚动改由 CSS touch-action 在遮罩与抽屉非滚动区拦截（见 layout.css）
+  // 抽屉是文档流视图而非 fixed 覆盖层（fixed 全屏层会让 Safari 展开工具栏、信号栏垫灰底）。
+  // 打开时记住主内容滚动位置并回顶展示抽屉；原路关闭时恢复，跳转新页面则交给页面自己回顶
+  const savedScroll = useRef(0);
+  const openedAtPath = useRef('');
+  useEffect(() => {
+    if (!isMobile) return;
+    if (drawerOpen) {
+      savedScroll.current = window.scrollY;
+      openedAtPath.current = location.pathname;
+      window.scrollTo(0, 0);
+    } else if (location.pathname === openedAtPath.current) {
+      window.scrollTo(0, savedScroll.current);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [drawerOpen, isMobile]);
 
   // 全局快捷键：Cmd/Ctrl+K 命令面板
   useEffect(() => {
@@ -158,8 +170,8 @@ export default function Layout() {
       <div className="workbench-body">
         {!isMobile && <aside className="workbench-sidebar">{sidebar}</aside>}
 
-        {isMobile && (
-          <aside className={`workbench-drawer${drawerOpen ? ' open' : ''}`} aria-label="笔记列表">
+        {isMobile && drawerOpen && (
+          <aside className="workbench-drawer" aria-label="笔记列表">
             <div className="drawer-head">
               <span className="drawer-title">全部笔记</span>
               <button className="icon-btn" onClick={closeDrawer} aria-label="关闭列表">
@@ -184,7 +196,7 @@ export default function Layout() {
           </aside>
         )}
 
-        <main className="workbench-main">
+        <main className="workbench-main" hidden={isMobile && drawerOpen}>
           <ErrorBoundary>
             <Suspense fallback={<Fallback />}>
               <Outlet />
