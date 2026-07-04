@@ -46,9 +46,10 @@ export default function Detail() {
 
   useDocumentTitle(note?.title);
 
-  // 切换笔记时回到内容区顶部
+  // 切换笔记时回到内容区顶部：桌面滚 .workbench-main，移动端滚文档，各自对不滚动的一方是空操作
   useEffect(() => {
     document.querySelector('.workbench-main')?.scrollTo({ top: 0 });
+    window.scrollTo({ top: 0 });
   }, [id]);
 
   const removeMutation = useMutation({
