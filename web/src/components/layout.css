@@ -144,45 +144,26 @@
   padding: 28px 32px calc(40px + var(--safe-bottom));
 }
 
-/* 移动端抽屉 */
-.drawer-backdrop {
-  position: fixed;
-  inset: 0;
-  z-index: 90;
-  background: rgba(10, 12, 18, 0.4);
-  opacity: 0;
-  pointer-events: none;
-  transition: opacity 0.22s ease;
-}
-
-.drawer-backdrop.open {
-  opacity: 1;
-  pointer-events: auto;
-  /* 拦截触摸滚动，背景不跟随；不锁 body，保住 Safari 全屏滚动状态 */
-  touch-action: none;
-}
-
+/* 移动端抽屉：全面屏覆盖，与主界面同底色，无遮罩无阴影 */
 .workbench-drawer {
   position: fixed;
+  inset: 0;
   z-index: 100;
-  top: 0;
-  bottom: 0;
-  left: 0;
-  width: min(320px, 86vw);
   background: var(--bg);
-  border-right: 1px solid var(--border);
-  box-shadow: var(--shadow-lg);
   display: flex;
   flex-direction: column;
   padding-top: var(--safe-top);
   padding-bottom: var(--safe-bottom);
   transform: translateX(-102%);
   transition: transform 0.26s cubic-bezier(0.3, 0.8, 0.3, 1);
+  visibility: hidden;
+  transition-property: transform, visibility;
 }
 
 .workbench-drawer.open {
   transform: translateX(0);
-  /* 抽屉自身非滚动区（头/尾）不把触摸传给 body；树区单独放行纵向滚动 */
+  visibility: visible;
+  /* 非滚动区（头/尾）不把触摸传给 body，保住 Safari 全屏滚动状态；树区单独放行纵向滚动 */
   touch-action: none;
 }
 
@@ -195,7 +176,7 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 10px 12px 10px 16px;
+  padding: 10px max(12px, var(--safe-right)) 10px max(16px, var(--safe-left));
   border-bottom: 1px solid var(--border);
 }
 
@@ -208,7 +189,7 @@
   flex: none;
   display: flex;
   gap: 10px;
-  padding: 12px 14px;
+  padding: 12px max(14px, var(--safe-right)) 12px max(14px, var(--safe-left));
   border-top: 1px solid var(--border);
 }
 
@@ -271,8 +252,7 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .workbench-drawer,
-  .drawer-backdrop {
+  .workbench-drawer {
     transition: none;
   }
 }

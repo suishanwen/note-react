@@ -159,36 +159,29 @@ export default function Layout() {
         {!isMobile && <aside className="workbench-sidebar">{sidebar}</aside>}
 
         {isMobile && (
-          <>
-            <div
-              className={`drawer-backdrop${drawerOpen ? ' open' : ''}`}
-              onClick={closeDrawer}
-              aria-hidden="true"
-            />
-            <aside className={`workbench-drawer${drawerOpen ? ' open' : ''}`} aria-label="笔记列表">
-              <div className="drawer-head">
-                <span className="drawer-title">全部笔记</span>
-                <button className="icon-btn" onClick={closeDrawer} aria-label="关闭列表">
-                  ✕
+          <aside className={`workbench-drawer${drawerOpen ? ' open' : ''}`} aria-label="笔记列表">
+            <div className="drawer-head">
+              <span className="drawer-title">全部笔记</span>
+              <button className="icon-btn" onClick={closeDrawer} aria-label="关闭列表">
+                ✕
+              </button>
+            </div>
+            {sidebar}
+            {isAuthed && (
+              <div className="drawer-foot">
+                <button
+                  className="btn"
+                  onClick={onUpdate}
+                  disabled={updateMutation.isPending}
+                >
+                  {updateMutation.isPending ? '触发中…' : '更新服务'}
+                </button>
+                <button className="btn" onClick={onSignOut}>
+                  退出登录
                 </button>
               </div>
-              {sidebar}
-              {isAuthed && (
-                <div className="drawer-foot">
-                  <button
-                    className="btn"
-                    onClick={onUpdate}
-                    disabled={updateMutation.isPending}
-                  >
-                    {updateMutation.isPending ? '触发中…' : '更新服务'}
-                  </button>
-                  <button className="btn" onClick={onSignOut}>
-                    退出登录
-                  </button>
-                </div>
-              )}
-            </aside>
-          </>
+            )}
+          </aside>
         )}
 
         <main className="workbench-main">
