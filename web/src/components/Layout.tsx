@@ -42,11 +42,24 @@ export default function Layout() {
     setDrawerOpen(false);
   }, [location.pathname]);
 
-  // 抽屉打开时锁定背景滚动
+  // 抽屉打开时锁定背景滚动：body 定格并记录滚动位置，关闭后原位恢复。
+  // 不能用 overflow:hidden——移动端滚动主体是 body，会坍塌滚动位置并破坏 Safari 全屏滚动状态
   useEffect(() => {
-    document.body.style.overflow = drawerOpen && isMobile ? 'hidden' : '';
+    if (!(drawerOpen && isMobile)) return;
+    const scrollY = window.scrollY;
+    const { style } = document.body;
+    style.position = 'fixed';
+    style.top = `-${scrollY}px`;
+    style.left = '0';
+    style.right = '0';
+    style.width = '100%';
     return () => {
-      document.body.style.overflow = '';
+      style.position = '';
+      style.top = '';
+      style.left = '';
+      style.right = '';
+      style.width = '';
+      window.scrollTo(0, scrollY);
     };
   }, [drawerOpen, isMobile]);
 

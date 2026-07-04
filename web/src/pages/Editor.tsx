@@ -108,12 +108,13 @@ export default function Editor() {
 
   const update = (patch: Partial<NoteInput>) => setForm((f) => ({ ...f, ...patch }));
 
-  const isDirty = JSON.stringify(form) !== baseline && !skipBlock.current;
+  const isDirty = JSON.stringify(form) !== baseline;
   // 新建模式有 localStorage 草稿兜底，只拦截编辑已有笔记
   const shouldBlock = isEdit && isDirty;
 
-  // 站内导航拦截：未保存时确认
-  const blocker = useBlocker(shouldBlock);
+  // 站内导航拦截：未保存时确认。必须用函数形式在导航发生时实时读 skipBlock——
+  // 保存成功后置 ref 再 navigate 发生在同一渲染周期内，布尔形式拿到的是置位前的旧值，会误拦保存跳转
+  const blocker = useBlocker(() => shouldBlock && !skipBlock.current);
   useEffect(() => {
     if (blocker.state !== 'blocked') return;
     let cancelled = false;
