@@ -1,4 +1,4 @@
-import { Link, Outlet, ScrollRestoration, useLocation, useMatch, useNavigate } from 'react-router-dom';
+import { Link, Outlet, useLocation, useMatch, useNavigate } from 'react-router-dom';
 import { Suspense, lazy, useCallback, useEffect, useRef, useState } from 'react';
 import { useMutation } from '@tanstack/react-query';
 import { useAuth } from '../auth';
@@ -37,10 +37,13 @@ export default function Layout() {
   const noteMatch = useMatch('/note/:id');
   const activeId = noteMatch ? Number(noteMatch.params.id) : null;
 
-  // 路由切换时自动收起移动端抽屉与搜索页
+  // 路由切换时自动收起移动端抽屉与搜索页，并回到页面顶部。
+  // 不用 ScrollRestoration：返回导航时它会恢复历史滚动深度，恢复瞬间
+  // iOS Safari 重新展开工具栏并给信号栏垫灰底；统一回顶则始终干净
   useEffect(() => {
     setDrawerOpen(false);
     setPaletteOpen(false);
+    window.scrollTo(0, 0);
   }, [location.pathname]);
 
   // 抽屉/搜索是文档流全屏视图而非 fixed 覆盖层（fixed 全屏层会让 iOS Safari 给信号栏垫灰底）。
@@ -213,9 +216,6 @@ export default function Layout() {
         </Suspense>
       )}
 
-      {/* 路由切换回顶：iOS Safari 在工具栏展开且页面滚动位置非 0 时会给信号栏垫灰底，
-          SPA 跳转（pushState）恰好触发工具栏展开，故每次导航都从顶部开始 */}
-      <ScrollRestoration />
     </div>
   );
 }
