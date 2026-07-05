@@ -53,11 +53,13 @@
   font-family: var(--font-mono);
 }
 
-/* 移动端源码输入：原生 textarea，随内容增高（JS 同步 scrollHeight），自身不滚动 */
+/* 移动端源码输入：原生 textarea，随内容增高（JS 同步 scrollHeight），自身不滚动。
+   最小高度近一屏：空内容时页面也超出视口，保有文档滚动余量，
+   Safari 工具栏才能随滑动收起（不足一屏的文档滚不动、永远收不起） */
 .live-editor-textarea {
   display: block;
   width: 100%;
-  min-height: 220px;
+  min-height: 75dvh;
   border: none;
   outline: none;
   resize: none;
