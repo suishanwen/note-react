@@ -37,14 +37,49 @@ export default function Layout() {
   const noteMatch = useMatch('/note/:id');
   const activeId = noteMatch ? Number(noteMatch.params.id) : null;
 
-  // 路由切换时自动收起移动端抽屉与搜索页，并回到页面顶部。
-  // 不用 ScrollRestoration：返回导航时它会恢复历史滚动深度，恢复瞬间
-  // iOS Safari 重新展开工具栏并给信号栏垫灰底；统一回顶则始终干净
+  // 路由切换时自动收起移动端抽屉与搜索页。
+  // 关键：iOS Safari 在 popstate（返回/前进）时，如果页面滚动位置非 0 或高度不足视口，
+  // 会把状态栏区域渲染成灰色合成层（这就是用户报告的“信号栏被遮”）。
+  // 必须在 popstate 发生后**尽早且多次**强制回顶，同时保证页面内容高度远大于视口。
   useEffect(() => {
     setDrawerOpen(false);
     setPaletteOpen(false);
-    window.scrollTo(0, 0);
   }, [location.pathname]);
+
+  // 移动端强制从顶部开始（尤其是返回导航）。普通 pathname effect 不够，
+  // 必须监听 popstate + 使用 rAF + setTimeout 多重保障。
+  useEffect(() => {
+    if (!isMobile) return;
+
+    const forceTop = () => {
+      window.scrollTo(0, 0);
+      requestAnimationFrame(() => {
+        window.scrollTo(0, 0);
+        // 再下一帧 + 宏任务，确保在 Safari 完成 popstate 布局计算后再强制
+        requestAnimationFrame(() => {
+          window.scrollTo(0, 0);
+          setTimeout(() => window.scrollTo(0, 0), 0);
+        });
+      });
+    };
+
+    // pathname 变化时也强制（前进导航）
+    forceTop();
+
+    const onPopState = () => forceTop();
+    window.addEventListener('popstate', onPopState);
+
+    // bfcache 恢复时也强制
+    const onPageShow = (e: PageTransitionEvent) => {
+      if (e.persisted) forceTop();
+    };
+    window.addEventListener('pageshow', onPageShow as EventListener);
+
+    return () => {
+      window.removeEventListener('popstate', onPopState);
+      window.removeEventListener('pageshow', onPageShow as EventListener);
+    };
+  }, [isMobile, location.pathname]);
 
   // 抽屉/搜索是文档流全屏视图而非 fixed 覆盖层（fixed 全屏层会让 iOS Safari 给信号栏垫灰底）。
   // 打开时记住滚动位置并回顶；原路关闭时恢复，跳转新页面时已在顶部无需处理（详情页另有回顶）

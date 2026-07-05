@@ -59,7 +59,12 @@
 .live-editor-textarea {
   display: block;
   width: 100%;
-  min-height: 70vh;
+  /* 必须远大于一屏（150vh+），因为新增页初始 textarea 内容为空。
+     如果高度只比视口略高或等于，iOS Safari 在 popstate 返回时会认为“此页无需滚动”，
+     把状态栏区域用灰色合成层固定住（这就是编辑页正常、新增页一直灰的根本原因）。
+     编辑页因为加载了真实笔记内容，scrollHeight 天然很大，所以不受影响。
+     用稳定 vh 而非 dvh。 */
+  min-height: 150vh;
   border: none;
   outline: none;
   resize: none;

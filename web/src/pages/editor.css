@@ -165,7 +165,17 @@
   border: 1px solid rgba(255, 255, 255, 0.3);
 }
 
-@media (max-width: 600px) {
+@media (max-width: 900px) {
+  /* 根源保障：新增页（空白表单）初始内容高度天然 < 视口。
+   * iOS Safari 在 popstate 返回时，如果文档 scrollHeight 不足，会把状态栏区域渲染成灰底合成层。
+   * 编辑页因为有真实长内容所以没事，新增页必须从第一帧就强制页面整体高度 > 视口。
+   * 这里给整个编辑页一个可靠的大最小高度，配合 .workbench-main 的 120vh 和 textarea 的 120vh，
+   * 确保无论是否输入，都有足够滚动余量。
+   */
+  .editor-page {
+    min-height: 140vh;
+  }
+
   .editor-title {
     font-size: 23px;
   }
