@@ -54,12 +54,12 @@
 }
 
 /* 移动端源码输入：原生 textarea，随内容增高（JS 同步 scrollHeight），自身不滚动。
-   最小高度近一屏：空内容时页面也超出视口，保有文档滚动余量，
-   Safari 工具栏才能随滑动收起（不足一屏的文档滚不动、永远收不起） */
+   最小高度近一屏（vh 稳定单位——dvh 会随工具栏收起实时变化，文档高度在滚动手势中
+   抖动会打断 Safari 的工具栏收起动画，卡在半收起的灰底状态） */
 .live-editor-textarea {
   display: block;
   width: 100%;
-  min-height: 75dvh;
+  min-height: 70vh;
   border: none;
   outline: none;
   resize: none;

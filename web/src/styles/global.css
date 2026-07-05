@@ -70,8 +70,8 @@ body {
 
 body,
 #root {
+  /* vh 稳定单位；dvh 随 Safari 工具栏收放实时变化，会让文档高度在滚动中抖动 */
   min-height: 100vh;
-  min-height: 100dvh;
 }
 
 body {

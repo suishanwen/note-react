@@ -148,7 +148,7 @@
    覆盖层会让文档不可滚动，Safari 随即展开工具栏并给信号栏垫灰底；
    文档流视图跟主内容一样走原生滚动，信号栏下照常透出内容 */
 .workbench-drawer {
-  min-height: 100dvh;
+  min-height: 100vh;
   display: flex;
   flex-direction: column;
   background: var(--bg);
@@ -201,11 +201,12 @@
 }
 
 @media (max-width: 900px) {
-  /* 移动端改走文档流滚动：内容透到状态栏下、Safari 工具栏随滚动收起，保留全屏滚动感 */
+  /* 移动端改走文档流滚动：内容透到状态栏下、Safari 工具栏随滚动收起，保留全屏滚动感。
+     min-height 用 vh 不用 dvh：dvh 随工具栏收放实时变化，文档高度在滚动中抖动
+     会打断工具栏收起动画 */
   .workbench {
     height: auto;
     min-height: 100vh;
-    min-height: 100dvh;
     overflow: visible;
   }
   /* 顶栏透明悬浮：空白区不拦截触摸，内容可从其下方滚过；品牌与按钮单独恢复点击 */
