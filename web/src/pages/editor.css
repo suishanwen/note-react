@@ -165,7 +165,20 @@
   border: 1px solid rgba(255, 255, 255, 0.3);
 }
 
-@media (max-width: 600px) {
+@media (max-width: 900px) {
+  /* 移动端编辑页没有全局顶栏，操作栏自己吸顶，保存随时可达；
+     sticky 不改变文档滚动语义，不影响 Safari 工具栏收起 */
+  .editor-bar {
+    position: sticky;
+    top: 0;
+    z-index: 30;
+    margin: 0 -14px 14px;
+    padding: calc(var(--safe-top) + 8px) 14px 8px;
+    background: color-mix(in srgb, var(--bg) 88%, transparent);
+    backdrop-filter: saturate(180%) blur(12px);
+    -webkit-backdrop-filter: saturate(180%) blur(12px);
+    border-bottom: 1px solid var(--border);
+  }
   .editor-title {
     font-size: 23px;
   }
