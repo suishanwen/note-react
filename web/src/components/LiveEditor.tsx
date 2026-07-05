@@ -1,4 +1,5 @@
 import { html } from '@codemirror/lang-html';
+import { EditorView } from '@codemirror/view';
 import LiveBlock from './LiveBlock';
 import SplitEditor from './SplitEditor';
 
@@ -14,7 +15,7 @@ export default function LiveEditor({ value, onChange }: Props) {
     <SplitEditor
       value={value}
       onChange={onChange}
-      extensions={[html()]}
+      extensions={[html(), EditorView.lineWrapping]}
       editorLabel="HTML / JS 源码"
       previewLabel="实时预览 · 沙箱运行"
       renderPreview={(v) => <LiveBlock html={v} />}

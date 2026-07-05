@@ -71,6 +71,12 @@
   .live-editor {
     grid-template-columns: 1fr;
   }
+  /* CodeMirror 的 .cm-scroller 自带 overflow:auto，在 iOS 上即使内容没溢出，
+     落在其上的滑动手势也只走滚动链传导、不收起 Safari 工具栏——强制不做滚动容器。
+     源码行由 lineWrapping 折行，无需横向滚动 */
+  .live-editor-pane .cm-scroller {
+    overflow: visible !important;
+  }
   .live-editor-preview {
     height: auto;
     overflow: visible;
