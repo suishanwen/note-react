@@ -68,14 +68,9 @@ body {
   min-height: 100%;
 }
 
-html {
-  height: -webkit-fill-available;
-}
-
 body,
 #root {
   min-height: 100vh;
-  min-height: -webkit-fill-available;
   min-height: 100dvh;
 }
 
@@ -84,9 +79,10 @@ body {
   background: var(--bg);
   color: var(--text);
   line-height: 1.65;
-  overflow-x: hidden;
+  /* 只裁剪不滚动：overflow-x:hidden 会把 body 变成滚动容器，
+     真机 Safari 不再把滑动当文档滚动——工具栏收不起、信号栏垫灰底 */
+  overflow-x: clip;
   -webkit-font-smoothing: antialiased;
-  -webkit-overflow-scrolling: touch;
   text-rendering: optimizeLegibility;
   transition: background var(--transition), color var(--transition);
 }
