@@ -3,6 +3,7 @@ import CodeMirror from '@uiw/react-codemirror';
 import { oneDark } from '@codemirror/theme-one-dark';
 import type { Extension } from '@codemirror/state';
 import type { EditorView } from '@codemirror/view';
+import { useMediaQuery } from '../hooks/useMediaQuery';
 import './liveEditor.css';
 
 interface Props {
@@ -36,6 +37,8 @@ export default function SplitEditor({
   onCreateEditor
 }: Props) {
   const [preview, setPreview] = useState(value);
+  // 移动端编辑器不做固定高内部滚动，随文档自然增高，保住 Safari 原生滚动
+  const isMobile = useMediaQuery('(max-width: 900px)');
   const isDark =
     typeof document !== 'undefined' &&
     document.documentElement.getAttribute('data-theme') === 'dark';
@@ -58,7 +61,8 @@ export default function SplitEditor({
         </div>
         <CodeMirror
           value={value}
-          height="460px"
+          height={isMobile ? 'auto' : '460px'}
+          minHeight={isMobile ? '220px' : undefined}
           theme={isDark ? oneDark : 'light'}
           extensions={extensions}
           onChange={onChange}

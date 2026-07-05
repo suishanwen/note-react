@@ -65,12 +65,14 @@
   border: none;
 }
 
-@media (max-width: 800px) {
+/* 移动端（与 Layout 断点一致）：单栏堆叠，源码与预览都随文档增高，
+   不做内部滚动容器——手指滑动始终滚文档，保住 Safari 全屏滚动 */
+@media (max-width: 900px) {
   .live-editor {
     grid-template-columns: 1fr;
   }
   .live-editor-preview {
     height: auto;
-    max-height: 460px;
+    overflow: visible;
   }
 }
