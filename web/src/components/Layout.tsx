@@ -37,10 +37,6 @@ export default function Layout() {
   const noteMatch = useMatch('/note/:id');
   const activeId = noteMatch ? Number(noteMatch.params.id) : null;
 
-  // 移动端编辑页不渲染全局悬浮顶栏：编辑页有自己的吸顶操作栏，悬浮按钮只会压在表单上
-  const isEditRoute = Boolean(useMatch('/edit')) || Boolean(useMatch('/edit/:id'));
-  const bareTopbar = isMobile && isEditRoute;
-
   // 路由切换时自动收起移动端抽屉与搜索页
   useEffect(() => {
     setDrawerOpen(false);
@@ -101,8 +97,7 @@ export default function Layout() {
   const sidebar = <Sidebar activeId={activeId} onNavigate={closeDrawer} />;
 
   return (
-    <div className={`workbench${bareTopbar ? ' workbench-bare' : ''}`}>
-      {!bareTopbar && (
+    <div className="workbench">
       <header className="topbar">
         <div className="topbar-left">
           {isMobile && (
@@ -173,7 +168,6 @@ export default function Layout() {
           )}
         </nav>
       </header>
-      )}
 
       <div className="workbench-body">
         {!isMobile && <aside className="workbench-sidebar">{sidebar}</aside>}

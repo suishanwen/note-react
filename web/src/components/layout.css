@@ -251,10 +251,6 @@
     padding: calc(var(--safe-top) + var(--mobile-topbar-height) + 6px)
       max(14px, var(--safe-right)) calc(32px + var(--safe-bottom)) max(14px, var(--safe-left));
   }
-  /* 无全局顶栏的页面（移动端编辑页）：安全区避让交给页面自己的吸顶操作栏 */
-  .workbench-bare .workbench-main {
-    padding-top: 0;
-  }
 }
 
 @media (prefers-reduced-motion: reduce) {
