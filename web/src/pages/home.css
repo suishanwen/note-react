@@ -1,5 +1,5 @@
 .home-page {
-  max-width: var(--w-read);
+  max-width: var(--w-wide);
   margin: 0 auto;
 }
 
@@ -18,8 +18,10 @@
 
 .home-card-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
   gap: 12px;
+  /* 大屏下限制最大列数，避免卡片过度拉伸 */
+  max-width: 1600px;
 }
 
 .home-card {
@@ -84,6 +86,8 @@
   border-radius: 8px;
   background: var(--bg-elevated);
   overflow: hidden;
+  /* 大屏下限制列表最大宽度，避免单行过长 */
+  max-width: 1000px;
 }
 
 .home-recent-row {
@@ -168,5 +172,24 @@
   .home-recent-title {
     flex: 1;
     max-width: none;
+  }
+}
+
+/* 大屏自适应：进一步放宽容器，卡片尺寸更合理 */
+@media (min-width: 1400px) {
+  .home-page {
+    max-width: min(1400px, 100%);
+  }
+  .home-card-grid {
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  }
+}
+
+@media (min-width: 1800px) {
+  .home-page {
+    max-width: min(1600px, 100%);
+  }
+  .home-card-grid {
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
   }
 }
