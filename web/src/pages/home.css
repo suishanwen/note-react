@@ -1,7 +1,18 @@
 .home-page {
-  /* 大屏自适应：放宽容器让网格多排列，但给卡片上限避免过度拉伸 */
-  max-width: 1280px;
+  max-width: 1360px;
   margin: 0 auto;
+}
+
+/* 双栏：主列自适应 + 右侧信息栏定宽 */
+.home-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 280px;
+  gap: 32px;
+  align-items: start;
+}
+
+.home-main {
+  min-width: 0;
 }
 
 .home-section {
@@ -19,8 +30,7 @@
 
 .home-card-grid {
   display: grid;
-  /* 卡片：最小 240px，最大 320px，避免被 1fr 拉得过宽；随视口自然增减列数 */
-  grid-template-columns: repeat(auto-fill, minmax(240px, 320px));
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
   gap: 12px;
 }
 
@@ -141,6 +151,99 @@
   font-variant-numeric: tabular-nums;
 }
 
+/* ===== 右侧信息栏 ===== */
+.home-aside {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  position: sticky;
+  top: 0;
+}
+
+.home-panel {
+  padding: 16px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--bg-elevated);
+  box-shadow: var(--shadow-sm);
+}
+
+.home-panel-title {
+  margin: 0 0 12px;
+  font-size: 12px;
+  font-weight: 650;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--text-faint);
+}
+
+.home-stat-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.home-stat {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.home-stat-num {
+  font-size: 24px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  font-variant-numeric: tabular-nums;
+  color: var(--text);
+}
+
+.home-stat-label {
+  font-size: 12px;
+  color: var(--text-faint);
+}
+
+.home-panel-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.home-tag-count {
+  font-style: normal;
+  margin-left: 5px;
+  font-size: 10.5px;
+  color: var(--text-faint);
+  font-family: var(--font-mono);
+}
+
+.home-timeline {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.home-timeline li {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 7px 0;
+  font-size: 13px;
+  color: var(--text-muted);
+  border-bottom: 1px solid var(--border);
+}
+
+.home-timeline li:last-child {
+  border-bottom: none;
+}
+
+.home-timeline b {
+  font-weight: 600;
+  color: var(--text);
+  font-variant-numeric: tabular-nums;
+}
+
 .home-empty {
   display: flex;
   flex-direction: column;
@@ -163,6 +266,17 @@
   color: var(--text-faint);
 }
 
+/* 中屏：收起信息栏，主列单独居中 */
+@media (max-width: 1180px) {
+  .home-layout {
+    grid-template-columns: minmax(0, var(--w-read));
+    justify-content: center;
+  }
+  .home-aside {
+    display: none;
+  }
+}
+
 @media (max-width: 900px) {
   .home-recent-summary {
     display: none;
@@ -170,18 +284,5 @@
   .home-recent-title {
     flex: 1;
     max-width: none;
-  }
-}
-
-/* 大屏进一步放宽内容区，但仍避免内容过宽 */
-@media (min-width: 1400px) {
-  .home-page {
-    max-width: 1400px;
-  }
-}
-
-@media (min-width: 1800px) {
-  .home-page {
-    max-width: 1600px;
   }
 }
