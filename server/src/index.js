@@ -9,6 +9,7 @@ import authRouter from './routes/auth.js';
 import notesRouter from './routes/notes.js';
 import uploadRouter from './routes/upload.js';
 import adminRouter from './routes/admin.js';
+import shareRouter from './routes/share.js';
 
 const app = express();
 app.set('trust proxy', true);
@@ -29,6 +30,7 @@ app.use('/api/auth', authRouter);
 app.use('/api/notes', notesRouter);
 app.use('/api/upload', uploadRouter);
 app.use('/api/admin', adminRouter);
+app.use('/api/share', shareRouter);
 
 // 上传文件静态访问
 fs.mkdirSync(config.uploadDir, { recursive: true });

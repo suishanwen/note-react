@@ -1,5 +1,12 @@
 import { request } from './client';
-import type { NoteSummary, NoteDetail, NoteInput } from '../types';
+import type {
+  NoteSummary,
+  NoteDetail,
+  NoteInput,
+  ShareInfo,
+  SharedNote,
+  ShareDuration
+} from '../types';
 
 export interface ListParams {
   keyword?: string;
@@ -54,6 +61,29 @@ export function login(password: string): Promise<{ token: string }> {
 // 触发宿主机远程更新（拉代码+重建+重启）
 export function triggerUpdate(): Promise<{ message: string }> {
   return request<{ message: string }>('/admin/update', { method: 'POST' });
+}
+
+// 查询笔记当前分享，未分享返回 null
+export function getShare(id: number): Promise<ShareInfo | null> {
+  return request<ShareInfo | null>(`/notes/${id}/share`);
+}
+
+// 生成或重设分享链接
+export function createShare(id: number, duration: ShareDuration): Promise<ShareInfo> {
+  return request<ShareInfo>(`/notes/${id}/share`, {
+    method: 'POST',
+    body: JSON.stringify({ duration })
+  });
+}
+
+// 取消分享
+export function deleteShare(id: number): Promise<{ id: number }> {
+  return request<{ id: number }>(`/notes/${id}/share`, { method: 'DELETE' });
+}
+
+// 免登录读取被分享笔记
+export function fetchShared(token: string): Promise<SharedNote> {
+  return request<SharedNote>(`/share/${token}`);
 }
 
 // 上传图片返回可访问 URL

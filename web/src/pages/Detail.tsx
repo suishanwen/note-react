@@ -1,10 +1,11 @@
-import { useEffect, useMemo, useRef } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { fetchNote, fetchNotes, deleteNote } from '../api/notes';
 import { ApiError } from '../api/client';
 import { useAuth } from '../auth';
 import Markdown from '../components/Markdown';
+import ShareDialog from '../components/ShareDialog';
 import Toc from '../components/Toc';
 import { useToast } from '../components/Toast';
 import { useConfirm } from '../components/ConfirmDialog';
@@ -22,6 +23,7 @@ export default function Detail() {
   const { toast } = useToast();
   const { confirm } = useConfirm();
   const contentRef = useRef<HTMLDivElement>(null);
+  const [shareOpen, setShareOpen] = useState(false);
 
   const { data: note, isLoading, isError, error } = useQuery({
     queryKey: ['note', id, isAuthed],
@@ -142,6 +144,11 @@ export default function Detail() {
                 <Link to={`/edit/${note.id}`} className="detail-op">
                   编辑
                 </Link>
+                {note.recommend !== ENCRYPTED && (
+                  <button className="detail-op" onClick={() => setShareOpen(true)}>
+                    分享
+                  </button>
+                )}
                 <button className="detail-op detail-op-danger" disabled={removeMutation.isPending} onClick={onDelete}>
                   删除
                 </button>
@@ -184,6 +191,8 @@ export default function Detail() {
       <aside className="detail-aside">
         <Toc contentRef={contentRef} content={note.content} />
       </aside>
+
+      {shareOpen && <ShareDialog noteId={note.id} onClose={() => setShareOpen(false)} />}
     </div>
   );
 }

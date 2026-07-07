@@ -18,3 +18,15 @@ CREATE TABLE IF NOT EXISTS `note` (
   KEY `idx_edit_time` (`edit_time`),
   KEY `idx_recommend` (`recommend`)
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- note_share 分享表：管理员对单篇公开笔记生成免登录只读链接
+CREATE TABLE IF NOT EXISTS `note_share` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `note_id` int(11) NOT NULL COMMENT '被分享的笔记 id',
+  `token` varchar(64) COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '随机分享凭证',
+  `expire_time` datetime DEFAULT NULL COMMENT '过期时间，NULL 表示永久有效',
+  `create_time` datetime NOT NULL COMMENT '创建时间',
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uk_token` (`token`),
+  UNIQUE KEY `uk_note` (`note_id`)
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;

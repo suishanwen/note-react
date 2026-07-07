@@ -34,3 +34,22 @@ export interface NoteInput {
   poster: string;
   recommend: number;
 }
+
+// 分享有效期：24 小时 / 7 天 / 永久
+export type ShareDuration = 'day' | 'week' | 'forever';
+
+// 当前分享信息，expireTime 为 null 表示永久
+export interface ShareInfo {
+  token: string;
+  expireTime: string | null;
+}
+
+// 分享页公开笔记（不含 ip 与加密标记）
+export interface SharedNote {
+  title: string;
+  content: string;
+  tag: string | null;
+  poster: string | null;
+  postTime: string | null;
+  editTime: string | null;
+}

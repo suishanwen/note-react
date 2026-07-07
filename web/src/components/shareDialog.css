@@ -1,0 +1,127 @@
+.share-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 260;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding: 16vh 16px 16px;
+  background: rgba(10, 12, 18, 0.42);
+  backdrop-filter: blur(3px);
+  -webkit-backdrop-filter: blur(3px);
+  animation: share-fade 0.16s ease;
+}
+
+.share-dialog {
+  width: min(460px, 100%);
+  background: var(--bg-elevated);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-lg);
+  padding: 22px 24px 18px;
+  animation: share-pop 0.18s cubic-bezier(0.2, 0.9, 0.3, 1.15);
+}
+
+.share-title {
+  margin: 0 0 14px;
+  font-size: 16.5px;
+  font-weight: 650;
+}
+
+.share-hint {
+  margin: 0 0 14px;
+  font-size: 13px;
+  line-height: 1.6;
+  color: var(--text-muted);
+}
+
+.share-link-row {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
+.share-link {
+  flex: 1;
+  min-width: 0;
+  font-family: var(--font-mono);
+  font-size: 12.5px;
+}
+
+.share-field {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 16px;
+  font-size: 13.5px;
+  color: var(--text-muted);
+}
+
+.share-field > span {
+  white-space: nowrap;
+}
+
+.share-field .input {
+  flex: 1;
+}
+
+.share-regen {
+  display: flex;
+  align-items: flex-end;
+  gap: 10px;
+  padding-top: 4px;
+  border-top: 1px solid var(--border);
+}
+
+.share-regen .share-field {
+  flex: 1;
+  margin-bottom: 0;
+  padding-top: 14px;
+}
+
+.share-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 20px;
+}
+
+@keyframes share-fade {
+  from {
+    opacity: 0;
+  }
+}
+
+@keyframes share-pop {
+  from {
+    opacity: 0;
+    transform: translateY(-8px) scale(0.97);
+  }
+}
+
+/* 移动端：全面屏，无遮罩灰底 */
+@media (max-width: 640px) {
+  .share-backdrop {
+    padding: 0;
+    background: var(--bg);
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+    align-items: stretch;
+  }
+  .share-dialog {
+    width: 100%;
+    border: none;
+    border-radius: 0;
+    box-shadow: none;
+    background: var(--bg);
+    padding: calc(var(--safe-top) + 24px) max(24px, var(--safe-right))
+      calc(24px + var(--safe-bottom)) max(24px, var(--safe-left));
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .share-backdrop,
+  .share-dialog {
+    animation: none;
+  }
+}

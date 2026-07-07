@@ -1,7 +1,9 @@
 import { Router } from 'express';
+import crypto from 'node:crypto';
 import pool from '../db.js';
 import { auth, canViewEncrypted } from '../middleware/auth.js';
 import { asyncHandler, HttpError } from '../middleware/error.js';
+import { isPathEncrypted } from '../encryption.js';
 
 const router = Router();
 
@@ -52,22 +54,6 @@ function makeEncryptionResolver(rows) {
     return result;
   };
   return (id) => resolve(id, new Set());
-}
-
-// 查询单条笔记是否处于加密路径下：只沿 parent 链逐级上溯，避免全表扫描。
-// 含环保护；任一节点（自身或祖先）加密即返回 true。
-async function isPathEncrypted(id) {
-  const seen = new Set();
-  let currentId = id;
-  while (currentId != null && currentId !== TOP_LEVEL && !seen.has(currentId)) {
-    seen.add(currentId);
-    const [rows] = await pool.query('SELECT parent, recommend FROM note WHERE id = ?', [currentId]);
-    if (!rows.length) return false;
-    const node = rows[0];
-    if (node.recommend === ENCRYPTED) return true;
-    currentId = node.parent;
-  }
-  return false;
 }
 
 // GET /api/notes — 列表。加密判定沿 parent 链：父级加锁则整棵子树都锁。
@@ -187,13 +173,67 @@ router.patch(
   })
 );
 
-// DELETE /api/notes/:id — 删除
+// DELETE /api/notes/:id — 删除，一并清理该笔记的分享，避免残留孤儿链接
 router.delete(
   '/:id',
   auth,
   asyncHandler(async (req, res) => {
     const [result] = await pool.query('DELETE FROM note WHERE id=?', [req.params.id]);
     if (!result.affectedRows) throw new HttpError(404, '笔记不存在');
+    await pool.query('DELETE FROM note_share WHERE note_id=?', [req.params.id]);
+    res.json({ id: Number(req.params.id) });
+  })
+);
+
+// 有效期时长 → 过期时间；forever 返回 null 表示永久
+function resolveExpireTime(duration) {
+  const now = Date.now();
+  if (duration === 'week') return new Date(now + 7 * 24 * 60 * 60 * 1000);
+  if (duration === 'forever') return null;
+  // 默认与 day 一致：24 小时
+  return new Date(now + 24 * 60 * 60 * 1000);
+}
+
+// GET /api/notes/:id/share — 查询当前分享，未分享返回 null
+router.get(
+  '/:id/share',
+  auth,
+  asyncHandler(async (req, res) => {
+    const [rows] = await pool.query(
+      'SELECT token, expire_time AS expireTime FROM note_share WHERE note_id=?',
+      [req.params.id]
+    );
+    res.json(rows.length ? rows[0] : null);
+  })
+);
+
+// POST /api/notes/:id/share — 生成或重设分享（换新 token + 有效期）
+router.post(
+  '/:id/share',
+  auth,
+  asyncHandler(async (req, res) => {
+    const id = Number(req.params.id);
+    const [notes] = await pool.query('SELECT id FROM note WHERE id=?', [id]);
+    if (!notes.length) throw new HttpError(404, '笔记不存在');
+    if (await isPathEncrypted(id)) throw new HttpError(400, '该笔记已加密，不可分享');
+
+    const token = crypto.randomBytes(24).toString('hex');
+    const expireTime = resolveExpireTime(req.body?.duration);
+    await pool.query(
+      `INSERT INTO note_share (note_id, token, expire_time, create_time) VALUES (?, ?, ?, ?)
+       ON DUPLICATE KEY UPDATE token=VALUES(token), expire_time=VALUES(expire_time), create_time=VALUES(create_time)`,
+      [id, token, expireTime, new Date()]
+    );
+    res.status(201).json({ token, expireTime });
+  })
+);
+
+// DELETE /api/notes/:id/share — 取消分享，旧链接立即失效
+router.delete(
+  '/:id/share',
+  auth,
+  asyncHandler(async (req, res) => {
+    await pool.query('DELETE FROM note_share WHERE note_id=?', [req.params.id]);
     res.json({ id: Number(req.params.id) });
   })
 );

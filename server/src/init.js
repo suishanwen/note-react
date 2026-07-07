@@ -21,6 +21,18 @@ const CREATE_TABLE_SQL = `CREATE TABLE IF NOT EXISTS note (
   KEY idx_recommend (recommend)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci`;
 
+// note_share 分享表：一篇笔记至多一条有效分享（note_id 唯一），token 免登录访问
+const CREATE_SHARE_TABLE_SQL = `CREATE TABLE IF NOT EXISTS note_share (
+  id int(11) NOT NULL AUTO_INCREMENT,
+  note_id int(11) NOT NULL,
+  token varchar(64) COLLATE utf8mb4_unicode_ci NOT NULL,
+  expire_time datetime DEFAULT NULL,
+  create_time datetime NOT NULL,
+  PRIMARY KEY (id),
+  UNIQUE KEY uk_token (token),
+  UNIQUE KEY uk_note (note_id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci`;
+
 const MIGRATE_FIELDS =
   'id, parent, content, edit_time, post_time, poster, title, ip, tag, recommend, summary';
 
@@ -50,6 +62,7 @@ async function ensureSchema() {
 
   const conn = await mysql.createConnection({ ...config.db, charset: 'utf8mb4_unicode_ci' });
   await conn.query(CREATE_TABLE_SQL);
+  await conn.query(CREATE_SHARE_TABLE_SQL);
   await conn.end();
 }
 
