@@ -16,7 +16,7 @@ interface Props {
 
 type ScrollRoot = HTMLElement | Window;
 
-const ACTIVE_OFFSET = 80;
+const ACTIVE_THRESHOLD = 24;
 
 function getScrollRoot(root: HTMLElement): ScrollRoot {
   let el = root.parentElement;
@@ -34,21 +34,15 @@ function getRootTop(root: ScrollRoot): number {
   return root instanceof HTMLElement ? root.getBoundingClientRect().top : 0;
 }
 
-function scrollToHeading(root: ScrollRoot, heading: HTMLElement) {
+function isScrollEnd(root: ScrollRoot): boolean {
   if (root instanceof HTMLElement) {
-    const targetTop =
-      root.scrollTop + heading.getBoundingClientRect().top - root.getBoundingClientRect().top - ACTIVE_OFFSET;
-    root.scrollTo({
-      top: targetTop,
-      behavior: 'smooth'
-    });
-    return;
+    const canScroll = root.scrollHeight > root.clientHeight + 2;
+    return canScroll && root.scrollTop + root.clientHeight >= root.scrollHeight - 2;
   }
 
-  window.scrollTo({
-    top: window.scrollY + heading.getBoundingClientRect().top - ACTIVE_OFFSET,
-    behavior: 'smooth'
-  });
+  const doc = document.documentElement;
+  const canScroll = doc.scrollHeight > window.innerHeight + 2;
+  return canScroll && window.scrollY + window.innerHeight >= doc.scrollHeight - 2;
 }
 
 // 文章目录：提取正文标题，滚动联动高亮，点击平滑跳转
@@ -93,13 +87,18 @@ export default function Toc({ contentRef, content }: Props) {
     const scroller = getScrollRoot(root);
 
     const onScroll = () => {
-      const top = getRootTop(scroller) + ACTIVE_OFFSET;
+      if (isScrollEnd(scroller)) {
+        setActiveId(headings[headings.length - 1].id);
+        return;
+      }
+
+      const top = getRootTop(scroller) + ACTIVE_THRESHOLD;
       let current = headings[0]?.id ?? '';
       for (const el of headingEls.current) {
         if (el.getBoundingClientRect().top <= top) current = el.id;
         else break;
       }
-      setActiveId(current);
+      setActiveId((prev) => (prev === current ? prev : current));
     };
     onScroll();
     scroller.addEventListener('scroll', onScroll, { passive: true });
@@ -124,7 +123,7 @@ export default function Toc({ contentRef, content }: Props) {
                 const root = contentRef.current;
                 if (!heading || !root) return;
                 setActiveId(h.id);
-                scrollToHeading(getScrollRoot(root), heading);
+                heading.scrollIntoView({ behavior: 'smooth', block: 'start' });
               }}
             >
               {h.text}
